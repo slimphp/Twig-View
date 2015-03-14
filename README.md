@@ -45,7 +45,7 @@ This component exposes a custom `url_for()` function to your Twig templates. You
     {% block body %}
     <h1>User List</h1>
     <ul>
-        <li><a href="{{ 'profile'|url_for({ "name": "josh" }) }}">Josh</a></li>
+        <li><a href="{{ url_for('profile', { 'name': 'josh' }) }}">Josh</a></li>
     </ul>
     {% endblock %}
 
