@@ -8,6 +8,8 @@
  */
 namespace Slim\Tests\Views;
 
+require dirname(__DIR__) . '/vendor/autoload.php';
+
 class TwigTest extends \PHPUnit_Framework_TestCase
 {
     protected $view;
