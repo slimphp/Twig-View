@@ -17,7 +17,7 @@ namespace Slim\Views;
  *
  * @link http://twig.sensiolabs.org/
  */
-class Twig implements \Pimple\ServiceProviderInterface
+class Twig extends \Slim\View implements \Pimple\ServiceProviderInterface
 {
     /**
      * Twig loader
@@ -50,8 +50,9 @@ class Twig implements \Pimple\ServiceProviderInterface
      * @param string $path     Path to templates directory
      * @param array  $settings Twig environment settings
      */
-    public function __construct($path, $settings = [])
+    public function __construct($path = './', $settings = [])
     {
+        parent::__construct();
         $this->loader = new \Twig_Loader_Filesystem($path);
         $this->environment = new \Twig_Environment($this->loader, $settings);
     }
