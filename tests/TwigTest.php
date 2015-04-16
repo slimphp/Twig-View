@@ -35,18 +35,26 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $mock = $this->getMockBuilder('Slim\Http\Response')
+        $mockBody = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
             ->disableOriginalConstructor()
-            ->setMethods(['write'])
             ->getMock();
-        $mock->expects($this->once())
+
+        $mockResponse = $this->getMockBuilder('Psr\Http\Message\ResponseInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockBody->expects($this->once())
             ->method('write')
             ->with("<p>Hi, my name is Josh.</p>\n")
-            ->willReturn($mock);
+            ->willReturn($mockResponse);
 
-        $response = $this->view->render($mock, 'example.html', [
+        $mockResponse->expects($this->once())
+            ->method('getBody')
+            ->willReturn($mockBody);
+
+        $response = $this->view->render($mockResponse, 'example.html', [
             'name' => 'Josh'
         ]);
-        $this->assertInstanceOf('Slim\Http\Response', $response);
+        $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $response);
     }
 }

@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "*",
-        "slim/slim": "dev-develop"
+        "psr/http-message": "~0.8"
     },
     "autoload": {
         "psr-4": {
