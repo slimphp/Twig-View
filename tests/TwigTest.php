@@ -8,15 +8,20 @@
  */
 namespace Slim\Tests\Views;
 
+use Slim\Views\Twig;
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 class TwigTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Twig
+     */
     protected $view;
 
     public function setUp()
     {
-        $this->view = new \Slim\Views\Twig(dirname(__FILE__) . '/templates');
+        $this->view = new Twig(dirname(__FILE__) . '/templates');
     }
 
     public function testFetch()
@@ -30,9 +35,26 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $this->expectOutputString("<p>Hi, my name is Josh.</p>\n");
-        $this->view->render('example.html', [
+        $mockBody = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockResponse = $this->getMockBuilder('Psr\Http\Message\ResponseInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockBody->expects($this->once())
+            ->method('write')
+            ->with("<p>Hi, my name is Josh.</p>\n")
+            ->willReturn($mockResponse);
+
+        $mockResponse->expects($this->once())
+            ->method('getBody')
+            ->willReturn($mockBody);
+
+        $response = $this->view->render($mockResponse, 'example.html', [
             'name' => 'Josh'
         ]);
+        $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $response);
     }
 }
