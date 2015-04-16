@@ -8,15 +8,20 @@
  */
 namespace Slim\Tests\Views;
 
+use Slim\Views\Twig;
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 class TwigTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Twig
+     */
     protected $view;
 
     public function setUp()
     {
-        $this->view = new \Slim\Views\Twig(dirname(__FILE__) . '/templates');
+        $this->view = new Twig(dirname(__FILE__) . '/templates');
     }
 
     public function testFetch()
@@ -30,9 +35,18 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $this->expectOutputString("<p>Hi, my name is Josh.</p>\n");
-        $this->view->render('example.html', [
+        $mock = $this->getMockBuilder('Slim\Http\Response')
+            ->disableOriginalConstructor()
+            ->setMethods(['write'])
+            ->getMock();
+        $mock->expects($this->once())
+            ->method('write')
+            ->with("<p>Hi, my name is Josh.</p>\n")
+            ->willReturn($mock);
+
+        $response = $this->view->render($mock, 'example.html', [
             'name' => 'Josh'
         ]);
+        $this->assertInstanceOf('Slim\Http\Response', $response);
     }
 }

@@ -8,6 +8,9 @@
  */
 namespace Slim\Views;
 
+
+use Slim\Http\Response;
+
 /**
  * Twig View
  *
@@ -94,12 +97,14 @@ class Twig implements \Pimple\ServiceProviderInterface
     /**
      * Output rendered template
      *
+     * @param Response $response
      * @param  string $template Template pathname relative to templates directory
-     * @param  array $data      Associative array of template variables
+     * @param  array $data Associative array of template variables
+     * @return Response
      */
-    public function render($template, $data = [])
+    public function render(Response $response, $template, $data = [])
     {
-        echo $this->fetch($template, $data);
+         return $response->write($this->fetch($template, $data));
     }
 
     /********************************************************************************

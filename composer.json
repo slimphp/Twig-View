@@ -18,7 +18,8 @@
         "twig/twig": "~1.18"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "slim/slim": "dev-develop"
     },
     "autoload": {
         "psr-4": {
