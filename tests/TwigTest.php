@@ -46,7 +46,7 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $mockBody->expects($this->once())
             ->method('write')
             ->with("<p>Hi, my name is Josh.</p>\n")
-            ->willReturn($mockResponse);
+            ->willReturn(28);
 
         $mockResponse->expects($this->once())
             ->method('getBody')
