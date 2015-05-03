@@ -104,7 +104,9 @@ class Twig implements \Pimple\ServiceProviderInterface
      */
     public function render(ResponseInterface $response, $template, $data = [])
     {
-         return $response->getBody()->write($this->fetch($template, $data));
+         $response->getBody()->write($this->fetch($template, $data));
+
+         return $response;
     }
 
     /********************************************************************************
