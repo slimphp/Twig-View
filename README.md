@@ -12,7 +12,7 @@ Via [Composer](https://getcomposer.org/)
 $ composer require slim/twig-view
 ```
 
-Requires PHP 5.4.0 or newer.
+Requires Slim Framework 3 and PHP 5.4.0 or newer.
 
 ## Usage
 
@@ -27,7 +27,7 @@ $app->register(new \Slim\Views\Twig('path/to/templates', [
 
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {
-    $this['view']->render('profile.html', [
+    return $this['view']->render($response, 'profile.html', [
         'name' => $args['name']
     ]);
 })->setName('profile');
