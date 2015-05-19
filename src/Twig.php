@@ -67,8 +67,8 @@ class Twig implements \Pimple\ServiceProviderInterface
     public function register(\Pimple\Container $container)
     {
         // Register urlFor Twig function
-        $this->environment->addFunction(new \Twig_SimpleFunction('url_for', function ($name, $data = []) use ($container) {
-            return $container['router']->urlFor($name, $data);
+        $this->environment->addFunction(new \Twig_SimpleFunction('url_for', function ($name, $data = [], $queryParams = []) use ($container) {
+            return $container['router']->urlFor($name, $data, $queryParams);
         }));
 
         // Register this view with the Slim container
