@@ -20,8 +20,11 @@ Requires Slim Framework 3 and PHP 5.4.0 or newer.
 // Create Slim app
 $app = new \Slim\App();
 
+// Fetch DI Container
+$container = $app->getContainer();
+
 // Register Twig View helper
-$app->register(new \Slim\Views\Twig('path/to/templates', [
+$container->register(new \Slim\Views\Twig('path/to/templates', [
     'cache' => 'path/to/cache'
 ]));
 
