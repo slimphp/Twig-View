@@ -30,7 +30,7 @@ $container->register(new \Slim\Views\Twig('path/to/templates', [
 
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {
-    return $this['view']->render($response, 'profile.html', [
+    return $this->getContainer()->get('view')->render($response, 'profile.html', [
         'name' => $args['name']
     ]);
 })->setName('profile');
