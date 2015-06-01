@@ -20,7 +20,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * @link http://twig.sensiolabs.org/
  */
-class Twig implements \Pimple\ServiceProviderInterface
+class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
 {
     /**
      * Twig loader
