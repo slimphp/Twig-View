@@ -68,20 +68,6 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
     {
         // Register this view with the Slim container
         $container['view'] = $this;
-
-        $this->registerExtension($container->get('router'), $container->get('request')->getUri());
-    }
-
-    /**
-     * Add our extension to the environment
-     *
-     * @param  Slim\Interfaces\RouterInterface $router
-     * @param  \Slim\Http\Uri $uri
-     * @return void
-     */
-    public function registerExtension($router, $uri)
-    {
-        $this->environment->addExtension(new TwigExtension($router, $uri));
     }
 
     /********************************************************************************
