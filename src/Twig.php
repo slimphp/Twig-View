@@ -80,6 +80,17 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
      *******************************************************************************/
 
     /**
+     * Proxy method to add an extension to the Twig environment
+     *
+     * @param array|object $extension A single extension instance or an array of instances
+     */
+    public function addExtension(\Twig_ExtensionInterface $extension)
+    {
+        $this->environment->addExtension($extension);
+    }
+
+
+    /**
      * Fetch rendered template
      *
      * @param  string $template Template pathname relative to templates directory
