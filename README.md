@@ -27,7 +27,10 @@ $container = $app->getContainer();
 $view = new \Slim\Views\Twig('path/to/templates', [
     'cache' => 'path/to/cache'
 ]);
-$view->addExtension($container->get('router'), $container->get('request')->getUri());
+$view->addExtension(new Slim\Views\TwigExtension(
+    $container->get('router'),
+    $container->get('request')->getUri()
+);
 
 // Register Twig View helper
 $container->register($view);
