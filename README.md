@@ -23,10 +23,17 @@ $app = new \Slim\App();
 // Fetch DI Container
 $container = $app->getContainer();
 
-// Register Twig View helper
-$container->register(new \Slim\Views\Twig('path/to/templates', [
+// Instantiate and add Slim specific extension
+$view = new \Slim\Views\Twig('path/to/templates', [
     'cache' => 'path/to/cache'
-]));
+]);
+$view->addExtension(new Slim\Views\TwigExtension(
+    $container->get('router'),
+    $container->get('request')->getUri()
+);
+
+// Register Twig View helper
+$container->register($view);
 
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {

@@ -8,8 +8,8 @@
  */
 namespace Slim\Views;
 
-
 use Psr\Http\Message\ResponseInterface;
+use Slim\Views\TwigExtension;
 
 /**
  * Twig View
@@ -66,11 +66,6 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
      */
     public function register(\Pimple\Container $container)
     {
-        // Register urlFor Twig function
-        $this->environment->addFunction(new \Twig_SimpleFunction('path_for', function ($name, $data = [], $queryParams = []) use ($container) {
-            return $container['router']->pathFor($name, $data, $queryParams);
-        }));
-
         // Register this view with the Slim container
         $container['view'] = $this;
     }
