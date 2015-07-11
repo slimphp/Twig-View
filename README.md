@@ -30,7 +30,7 @@ $view = new \Slim\Views\Twig('path/to/templates', [
 $view->addExtension(new Slim\Views\TwigExtension(
     $container->get('router'),
     $container->get('request')->getUri()
-);
+));
 
 // Register Twig View helper
 $container->register($view);
