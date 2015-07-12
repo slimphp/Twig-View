@@ -48,14 +48,14 @@ $app->run();
 
 ## Custom template functions
 
-This component exposes a custom `url_for()` function to your Twig templates. You can use this function to generate complete URLs to any Slim application named route. This is an example Twig template:
+This component exposes a custom `path_for()` function to your Twig templates. You can use this function to generate complete URLs to any Slim application named route. This is an example Twig template:
 
     {% extends "layout.html" %}
 
     {% block body %}
     <h1>User List</h1>
     <ul>
-        <li><a href="{{ url_for('profile', { 'name': 'josh' }) }}">Josh</a></li>
+        <li><a href="{{ path_for('profile', { 'name': 'josh' }) }}">Josh</a></li>
     </ul>
     {% endblock %}
 
