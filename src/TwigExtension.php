@@ -36,6 +36,7 @@ class TwigExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('path_for', array($this, 'pathFor')),
             new \Twig_SimpleFunction('base_url', array($this, 'baseUrl')),
+            new \Twig_SimpleFunction('base_path_for', array($this, 'basePathFor')),
         ];
     }
 
@@ -48,6 +49,22 @@ class TwigExtension extends \Twig_Extension
     {
         if (method_exists($this->uri, 'getBaseUrl')) {
             return $this->uri->getBaseUrl();
+        }
+    }
+
+    /**
+     * Create base path for named path
+     *
+     * @param string $name        Route name
+     * @param array  $data        Named argument replacement data
+     * @param array  $queryParams Optional query string parameters
+     *
+     * @return string
+     */
+    public function basePathFor($name, $data = [], $queryParams = [])
+    {
+        if (method_exists($this->uri, 'getBasePath')) {
+            return $this->uri->getBasePath() . $this->router->pathFor($name, $data, $queryParams);
         }
     }
 }
