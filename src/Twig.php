@@ -132,7 +132,7 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
     /**
      * Return Twig environment
      *
-     * @return \Twig_EnvironmentInterface
+     * @return \Twig_Environment
      */
     public function getEnvironment()
     {
