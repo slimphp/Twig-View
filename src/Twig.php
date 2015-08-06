@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Slim Framework (http://slimframework.com)
  *
@@ -6,10 +7,12 @@
  * @copyright Copyright (c) 2011-2015 Josh Lockhart
  * @license   https://github.com/slimphp/Twig-View/blob/master/LICENSE.md (MIT License)
  */
+
 namespace Slim\Views;
 
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Views\TwigExtension;
 
 /**
  * Twig View
@@ -20,7 +23,7 @@ use Slim\Views\TwigExtension;
  *
  * @link http://twig.sensiolabs.org/
  */
-class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
+class Twig implements \ArrayAccess, ServiceProviderInterface
 {
     /**
      * Twig loader
@@ -53,7 +56,7 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
      * @param string $path     Path to templates directory
      * @param array  $settings Twig environment settings
      */
-    public function __construct($path, $settings = [])
+    public function __construct($path, array $settings = [])
     {
         $this->loader = new \Twig_Loader_Filesystem($path);
         $this->environment = new \Twig_Environment($this->loader, $settings);
@@ -64,7 +67,7 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
      *
      * @param Container $container The Pimple container
      */
-    public function register(\Pimple\Container $container)
+    public function register(Container $container)
     {
         // Register this view with the Slim container
         $container['view'] = $this;
@@ -77,13 +80,12 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
     /**
      * Proxy method to add an extension to the Twig environment
      *
-     * @param array|object $extension A single extension instance or an array of instances
+     * @param \Twig_ExtensionInterface $extension A single extension instance or an array of instances
      */
     public function addExtension(\Twig_ExtensionInterface $extension)
     {
         $this->environment->addExtension($extension);
     }
-
 
     /**
      * Fetch rendered template
@@ -93,7 +95,7 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
      *
      * @return string
      */
-    public function fetch($template, $data = [])
+    public function fetch($template, array $data = [])
     {
         $data = array_merge($this->defaultVariables, $data);
 
@@ -108,7 +110,7 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
      * @param  array $data Associative array of template variables
      * @return ResponseInterface
      */
-    public function render(ResponseInterface $response, $template, $data = [])
+    public function render(ResponseInterface $response, $template, array $data = [])
     {
          $response->getBody()->write($this->fetch($template, $data));
 
