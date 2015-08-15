@@ -24,15 +24,15 @@ $app = new \Slim\App();
 $container = $app->getContainer();
 
 // Register Twig View helper
-// Instantiate and add Slim specific extension
-$container['view'] = function () {
+$container['view'] = function ($c) {
     $view = new \Slim\Views\Twig('path/to/templates', [
         'cache' => 'path/to/cache'
     ]);
-
+    
+    // Instantiate and add Slim specific extension
     $view->addExtension(new Slim\Views\TwigExtension(
-        $container->get('router'),
-        $container->get('request')->getUri()
+        $c['router'],
+        $c['request']->getUri()
     ));
 
     return $view;
