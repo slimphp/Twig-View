@@ -20,7 +20,7 @@ use Slim\Views\TwigExtension;
  *
  * @link http://twig.sensiolabs.org/
  */
-class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
+class Twig implements \ArrayAccess
 {
     /**
      * Twig loader
@@ -59,17 +59,6 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
         $this->environment = new \Twig_Environment($this->loader, $settings);
     }
 
-    /**
-     * Register service with container
-     *
-     * @param Container $container The Pimple container
-     */
-    public function register(\Pimple\Container $container)
-    {
-        // Register this view with the Slim container
-        $container['view'] = $this;
-    }
-
     /********************************************************************************
      * Methods
      *******************************************************************************/
@@ -77,7 +66,7 @@ class Twig implements \ArrayAccess, \Pimple\ServiceProviderInterface
     /**
      * Proxy method to add an extension to the Twig environment
      *
-     * @param array|object $extension A single extension instance or an array of instances
+     * @param \Twig_ExtensionInterface $extension A single extension instance or an array of instances
      */
     public function addExtension(\Twig_ExtensionInterface $extension)
     {
