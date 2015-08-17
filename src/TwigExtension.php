@@ -16,7 +16,7 @@ class TwigExtension extends \Twig_Extension
     private $router;
 
     /**
-     * @var \Slim\Http\Uri
+     * @var string|\Slim\Http\Uri
      */
     private $uri;
 
@@ -46,6 +46,9 @@ class TwigExtension extends \Twig_Extension
 
     public function baseUrl()
     {
+        if (is_string($this->uri)) {
+            return $this->uri;
+        }
         if (method_exists($this->uri, 'getBaseUrl')) {
             return $this->uri->getBaseUrl();
         }
