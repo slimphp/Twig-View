@@ -73,6 +73,16 @@ class Twig implements \ArrayAccess
         $this->environment->addExtension($extension);
     }
 
+    /**
+     * Registers a Filter.
+     *
+     * @param string|Twig_SimpleFilter               $name   The filter name or a Twig_SimpleFilter instance
+     * @param Twig_FilterInterface|Twig_SimpleFilter $filter A Twig_FilterInterface instance or a Twig_SimpleFilter instance
+     */
+    public function addFilter($name, $filter = null)
+    {
+        $this->environment->addFilter($name, $filter);
+    }
 
     /**
      * Fetch rendered template
