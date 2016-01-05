@@ -49,7 +49,6 @@ class TwigExtension extends \Twig_Extension
         if (method_exists($this->uri, 'getBaseUrl')) {
             // remove index.php if exist
             return $this->isIndex($this->uri->getBaseUrl());
-//            return $this->uri->getBaseUrl();
         }
     }
     
@@ -61,7 +60,7 @@ class TwigExtension extends \Twig_Extension
 
         $checkurl = explode("/", $uri);
         $popindex = array_pop($checkurl);
-        $return = ""; // no return if index.php
+        $return = ""; 
         if ($popindex <> "index.php") {
             $return = $uri;
         } elseif ($popindex == "index.php") {
