@@ -53,4 +53,9 @@ class TwigExtension extends \Twig_Extension
             return $this->uri->getBaseUrl();
         }
     }
+
+    public function setBaseUrl($baseUrl)
+    {
+        $this->uri = $baseUrl;
+    }
 }
