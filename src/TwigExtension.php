@@ -59,7 +59,7 @@ class TwigExtension extends \Twig_Extension
         }
         
         $return = $uri;
-        if (preg_match("/.php/i", $uri)) {
+        if (preg_match("/\.php$/i", $uri)) {
             $checkurl = explode("/", $uri);
             $popPHPscript = array_pop($checkurl);
             $return = implode("/", $checkurl);
