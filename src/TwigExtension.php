@@ -50,7 +50,14 @@ class TwigExtension extends \Twig_Extension
             return $this->uri;
         }
         if (method_exists($this->uri, 'getBaseUrl')) {
-            return $this->uri->getBaseUrl();
+            $return = $this->uri->getBaseUrl();
+            // remove *.php if exist
+            if (preg_match("/\.php$/i", $return)) {
+                $checkurl = explode("/", $return);
+                $popPHPscript = array_pop($checkurl);
+                $return = implode("/", $checkurl);
+            } 
+            return $return;
         }
     }
 }
