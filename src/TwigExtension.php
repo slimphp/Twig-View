@@ -47,25 +47,14 @@ class TwigExtension extends \Twig_Extension
     public function baseUrl()
     {
         if (method_exists($this->uri, 'getBaseUrl')) {
-            // remove index.php if exist
-            return $this->isIndex($this->uri->getBaseUrl());
+            $return = $this->uri->getBaseUrl();
+            // remove *.php if exist
+            if (preg_match("/\.php$/i", $return)) {
+                $checkurl = explode("/", $return);
+                $popPHPscript = array_pop($checkurl);
+                $return = implode("/", $checkurl);
+            } 
+            return $return;
         }
-    }
-    
-    public function isIndex($uri) {
-
-        if (empty($uri)) {
-            return;
-        }
-
-        $checkurl = explode("/", $uri);
-        $popindex = array_pop($checkurl);
-        $return = ""; 
-        if ($popindex <> "index.php") {
-            $return = $uri;
-        } elseif ($popindex == "index.php") {
-            $return = implode("/", $checkurl);
-        }
-        return $return;
     }
 }
