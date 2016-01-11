@@ -51,6 +51,7 @@ class TwigExtension extends \Twig_Extension
         }
         if (method_exists($this->uri, 'getBaseUrl')) {
             $url = $this->uri->getBaseUrl();
+            // remove script name from URL for view that use base_url so that css and js will show correctly
             return preg_replace('/\/\w+\.php$/i', '', rtrim($url,'/'));            
         }
     }
