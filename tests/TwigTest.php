@@ -33,6 +33,39 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
     }
 
+    public function testSingleTemplateWithANamespace()
+    {
+        $views = new Twig([
+            'One' => __DIR__.'/templates',
+        ]);
+
+        $output = $views->fetch('@One/example.html', [
+            'name' => 'Josh'
+        ]);
+
+        $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
+    }
+
+    public function testMultipleTemplatesWithMulNamespace()
+    {
+        $views = new Twig([
+            'One' => __DIR__.'/templates',
+            'Two' => __DIR__.'/another',
+        ]);
+
+        $outputOne = $views->fetch('@One/example.html', [
+            'name' => 'Peter'
+        ]);
+
+        $outputTwo = $views->fetch('@Two/example.html', [
+            'name'   => 'Peter',
+            'gender' => 'male'
+        ]);
+
+        $this->assertEquals("<p>Hi, my name is Peter.</p>\n", $outputOne);
+        $this->assertEquals("<p>Hi, my name is Peter and I am male.</p>\n", $outputTwo);
+    }
+
     public function testRender()
     {
         $mockBody = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
