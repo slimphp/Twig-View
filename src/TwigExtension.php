@@ -53,4 +53,15 @@ class TwigExtension extends \Twig_Extension
             return $this->uri->getBaseUrl();
         }
     }
+
+    /**
+     * Set the base url
+     *
+     * @param string|Slim\Http\Uri $baseUrl
+     * @return void
+     */
+    public function setBaseUrl($baseUrl)
+    {
+        $this->uri = $baseUrl;
+    }
 }
