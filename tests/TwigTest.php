@@ -14,29 +14,55 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 class TwigTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Twig
-     */
-    protected $view;
-
-    public function setUp()
-    {
-        $this->view = new Twig(dirname(__FILE__) . '/templates');
-    }
-
     public function testFetch()
     {
-        $output = $this->view->fetch('example.html', [
+        $view = new Twig(dirname(__FILE__) . '/templates');
+
+        $output = $view->fetch('example.html', [
             'name' => 'Josh'
         ]);
 
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
     }
 
+    public function testSingleNamespaceAndMultipleDirectories()
+    {
+        $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
+
+        $view = new Twig(
+            [
+                'namespace' => [
+                    __DIR__.'/another',
+                    __DIR__.'/templates',
+                    __DIR__.'/multi',
+                ],
+            ]
+        );
+
+        $anotherDirectory = $view->fetch('@namespace/example.html', [
+            'name' => 'Peter'
+        ]);
+
+        $templatesDirectory = $view->fetch('@namespace/another_example.html', [
+            'name'   => 'Peter',
+            'gender' => 'male',
+        ]);
+
+        $outputMulti = $view->fetch('@namespace/directory/template/example.html', [
+            'weekday' => $weekday,
+        ]);
+
+        $this->assertEquals("<p>Hi, my name is Peter.</p>\n", $anotherDirectory);
+        $this->assertEquals("<p>Hi, my name is Peter and I am male.</p>\n", $templatesDirectory);
+        $this->assertEquals('Happy Tuesday!', $outputMulti);
+    }
+
     public function testSingleTemplateWithANamespace()
     {
         $views = new Twig([
-            'One' => __DIR__.'/templates',
+            'One' => [
+                __DIR__.'/templates',
+            ],
         ]);
 
         $output = $views->fetch('@One/example.html', [
@@ -48,26 +74,38 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleTemplatesWithMulNamespace()
     {
+        $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
+
         $views = new Twig([
-            'One' => __DIR__.'/templates',
-            'Two' => __DIR__.'/another',
+            'One'   => __DIR__.'/templates',
+            'Two'   => __DIR__.'/another',
+            'Three' => [
+                __DIR__.'/multi',
+            ],
         ]);
 
         $outputOne = $views->fetch('@One/example.html', [
             'name' => 'Peter'
         ]);
 
-        $outputTwo = $views->fetch('@Two/example.html', [
+        $outputTwo = $views->fetch('@Two/another_example.html', [
             'name'   => 'Peter',
             'gender' => 'male'
         ]);
 
+        $outputThree = $views->fetch('@Three/directory/template/example.html', [
+            'weekday' => $weekday,
+        ]);
+
         $this->assertEquals("<p>Hi, my name is Peter.</p>\n", $outputOne);
         $this->assertEquals("<p>Hi, my name is Peter and I am male.</p>\n", $outputTwo);
+        $this->assertEquals('Happy Tuesday!', $outputThree);
     }
 
     public function testRender()
     {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+
         $mockBody = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,7 +123,7 @@ class TwigTest extends \PHPUnit_Framework_TestCase
             ->method('getBody')
             ->willReturn($mockBody);
 
-        $response = $this->view->render($mockResponse, 'example.html', [
+        $response = $view->render($mockResponse, 'example.html', [
             'name' => 'Josh'
         ]);
         $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $response);
