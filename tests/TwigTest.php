@@ -72,7 +72,7 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
     }
 
-    public function testMultipleTemplatesWithMulNamespace()
+    public function testMultipleTemplatesWithMultipleNamespace()
     {
         $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
 
