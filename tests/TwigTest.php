@@ -102,6 +102,23 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Happy Tuesday!', $outputThree);
     }
 
+    public function testMultipleDirectoriesWithoutNamespaces()
+    {
+        $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
+        $view    = new Twig([__DIR__.'/multi/', __DIR__.'/another/']);
+
+        $rootDirectory = $view->fetch('directory/template/example.html', [
+            'weekday' => $weekday,
+        ]);
+        $multiDirectory  = $view->fetch('another_example.html', [
+            'name'   => 'Peter',
+            'gender' => 'male',
+        ]);
+
+        $this->assertEquals('Happy Tuesday!', $rootDirectory);
+        $this->assertEquals("<p>Hi, my name is Peter and I am male.</p>\n", $multiDirectory);
+    }
+
     public function testRender()
     {
         $view = new Twig(dirname(__FILE__) . '/templates');
