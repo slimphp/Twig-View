@@ -57,12 +57,25 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Happy Tuesday!', $outputMulti);
     }
 
-    public function testSingleTemplateWithANamespace()
+    public function testArrayWithASingleTemplateWithANamespace()
     {
         $views = new Twig([
             'One' => [
                 __DIR__.'/templates',
             ],
+        ]);
+
+        $output = $views->fetch('@One/example.html', [
+            'name' => 'Josh'
+        ]);
+
+        $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
+    }
+
+    public function testASingleTemplateWithANamespace()
+    {
+        $views = new Twig([
+            'One' => __DIR__.'/templates',
         ]);
 
         $output = $views->fetch('@One/example.html', [
