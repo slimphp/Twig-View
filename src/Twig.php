@@ -118,7 +118,11 @@ class Twig implements \ArrayAccess
         $loader = new \Twig_Loader_Filesystem();
 
         foreach ($paths as $namespace => $path) {
-            $loader->addPath($path, $namespace);
+            if (is_string($namespace)) {
+                $loader->setPaths($path, $namespace);
+            } else {
+                $loader->addPath($path);
+            }
         }
 
         return $loader;
