@@ -9,7 +9,6 @@
 namespace Slim\Views;
 
 use Psr\Http\Message\ResponseInterface;
-use Slim\Views\TwigExtension;
 
 /**
  * Twig View
