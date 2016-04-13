@@ -93,6 +93,21 @@ class Twig implements \ArrayAccess
     }
 
     /**
+     * Fetch rendered string
+     *
+     * @param  string $string String
+     * @param  array  $data   Associative array of template variables
+     *
+     * @return string
+     */
+    public function fetchFromString($string ="", $data = [])
+    {
+        $data = array_merge($this->defaultVariables, $data);
+
+        return $this->environment->createTemplate($string)->render($data);
+    }
+
+    /**
      * Output rendered template
      *
      * @param ResponseInterface $response
