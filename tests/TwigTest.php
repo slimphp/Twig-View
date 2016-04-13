@@ -25,6 +25,17 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
     }
 
+    public function testFetchFromString()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+
+        $output = $view->fetchFromString("<p>Hi, my name is {{ name }}.</p>", [
+            'name' => 'Josh'
+        ]);
+
+        $this->assertEquals("<p>Hi, my name is Josh.</p>", $output);
+    }
+
     public function testSingleNamespaceAndMultipleDirectories()
     {
         $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
