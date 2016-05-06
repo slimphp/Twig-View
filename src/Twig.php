@@ -78,6 +78,16 @@ class Twig implements \ArrayAccess
 
 
     /**
+     * Proxy method to add a function to the Twig environment
+     *
+     * @param \Twig_SimpleFunction $function A single function instance
+     */
+    public function addFunction(\Twig_SimpleFunction $function)
+    {
+        $this->environment->addFunction($function);
+    }
+
+    /**
      * Fetch rendered template
      *
      * @param  string $template Template pathname relative to templates directory
