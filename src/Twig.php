@@ -100,7 +100,7 @@ class Twig implements \ArrayAccess
      * @param  array $data Associative array of template variables
      * @return ResponseInterface
      */
-    public function render(ResponseInterface $response, $template, $data = [])
+    public function render(ResponseInterface $response, $template, array $data = [])
     {
          $response->getBody()->write($this->fetch($template, $data));
 
