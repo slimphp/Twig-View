@@ -31,11 +31,19 @@ class TwigExtension extends \Twig_Extension
         return 'slim';
     }
 
+    /**
+     * Modified by Walter Allen, 2016
+     * to utilize the helper functions originally available
+     * to Slim 2 Framework users in the Slim/Views package
+     * as seen at https://github.com/slimphp/Slim-Views
+     */
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('path_for', array($this, 'pathFor')),
-            new \Twig_SimpleFunction('base_url', array($this, 'baseUrl')),
+            new \Twig_SimpleFunction('pathFor', array($this, 'pathFor')),
+            new \Twig_SimpleFunction('baseUrl', array($this, 'baseUrl')),
+            new \Twig_SimpleFunction('siteUrl', array($this, 'siteForUrl')),
+            new \Twig_SimpleFunction('currentUrl', array($this, 'currentUrl'))
         ];
     }
 
@@ -52,6 +60,17 @@ class TwigExtension extends \Twig_Extension
         if (method_exists($this->uri, 'getBaseUrl')) {
             return $this->uri->getBaseUrl();
         }
+    }
+
+    public function siteForUrl($url)
+    {
+        return $this->baseurl() . '/' . ltrim($url, '/');
+    }
+
+    public function currentUrl($withQueryString = true, $appName = 'default')
+    {
+        $uri=$this->baseUrl() . $this->uri->getPath();
+        return $uri;
     }
 
     /**
