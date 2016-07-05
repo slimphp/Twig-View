@@ -36,6 +36,7 @@ class TwigExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('path_for', array($this, 'pathFor')),
             new \Twig_SimpleFunction('base_url', array($this, 'baseUrl')),
+            new \Twig_SimpleFunction('is_current_path', array($this, 'isCurrentPath')),
         ];
     }
 
@@ -52,6 +53,11 @@ class TwigExtension extends \Twig_Extension
         if (method_exists($this->uri, 'getBaseUrl')) {
             return $this->uri->getBaseUrl();
         }
+    }
+
+    public function isCurrentPath($name)
+    {
+        return $this->router->pathFor($name) === $this->uri->getPath();
     }
 
     /**
