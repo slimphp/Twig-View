@@ -192,6 +192,16 @@ class Twig implements \ArrayAccess
     }
 
     /**
+     * Add items array to collection
+     *
+     * @param array $data   Associative array of template variables
+     */
+    public function offsetAdd(array $data=[])
+    {
+        $this->defaultVariables = array_merge($this->defaultVariables, $data);
+    }
+
+    /**
      * Remove item from collection
      *
      * @param string $key The data key
