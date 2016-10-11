@@ -9,7 +9,6 @@
 namespace Slim\Views;
 
 use Psr\Http\Message\ResponseInterface;
-use Slim\Views\TwigExtension;
 
 /**
  * Twig View
@@ -55,10 +54,7 @@ class Twig implements \ArrayAccess
      */
     public function __construct($path, $settings = [])
     {
-        $this->loader = is_string($path)
-            ? new \Twig_Loader_Filesystem($path)
-            : $this->addPaths($path);
-
+        $this->loader = $this->createLoader(is_string($path) ? [$path] : $path);
         $this->environment = new \Twig_Environment($this->loader, $settings);
     }
 
@@ -108,12 +104,12 @@ class Twig implements \ArrayAccess
     }
 
     /**
-     * Add a selection of paths with the desired namespace
+     * Create a loader with the given path
      *
      * @param array $paths
      * @return \Twig_Loader_Filesystem
      */
-    private function addPaths(array $paths)
+    private function createLoader(array $paths)
     {
         $loader = new \Twig_Loader_Filesystem();
 
