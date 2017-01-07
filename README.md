@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/slimphp/Twig-View.svg?branch=master)](https://travis-ci.org/slimphp/Twig-View)
 
-This is a Slim Framework view helper built on top of the Twig 2 templating component. You can use this component to create and render templates in your Slim Framework application.
+This is a Slim Framework view helper built on top of the Twig templating component. You can use this component to create and render templates in your Slim Framework application. It works with Twig 1.18+ (PHP5.5+) and with Twig 2 (PHP7).
 
 ## Install
 
