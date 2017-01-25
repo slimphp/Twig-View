@@ -9,4 +9,4 @@ php:
 
 before_script: composer install
 
-script: phpunit --coverage-text --configuration phpunit.xml.dist
+script: vendor/bin/phpunit --coverage-text --configuration phpunit.xml.dist
