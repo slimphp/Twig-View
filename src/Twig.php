@@ -113,9 +113,10 @@ class Twig implements \ArrayAccess
      */
     public function render(ResponseInterface $response, $template, $data = [])
     {
-         $response->getBody()->write($this->fetch($template, $data));
+		$data = array_merge($this->defaultVariables, $data);
+        $response->getBody()->write($this->fetch($template, $data));
 
-         return $response;
+        return $response;
     }
 
     /**
