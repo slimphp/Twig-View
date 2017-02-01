@@ -72,6 +72,17 @@ class Twig implements \ArrayAccess
         $this->environment->addExtension($extension);
     }
 
+    /**
+     * Proxy method to add Registers a Global
+     *
+     * @param string $name  The global name
+     * @param mixed  $value The global value
+     */
+    public function addGlobal($name, $value)
+    {
+         $this->environment->addGlobal($name, $value);
+    }
+
 
     /**
      * Fetch rendered template
