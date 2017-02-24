@@ -12,7 +12,7 @@ Via [Composer](https://getcomposer.org/)
 $ composer require slim/twig-view
 ```
 
-Requires Slim Framework 3 and PHP 5.5.0 or newer.
+Requires Slim Framework 3 and PHP 5.5.0 or newer. For specific PHP version, add main `"twig/twig"` package in your app to avoid compatibility issue. For PHP >= 5.5.0 `"twig/twig": "^1.8",`, PHP >= 7.0 `"twig/twig": "^2.0",`
 
 ## Usage
 
