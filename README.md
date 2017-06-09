@@ -31,7 +31,7 @@ $container['view'] = function ($c) {
     
     // Instantiate and add Slim specific extension
     $basePath = rtrim(str_ireplace('index.php', '', $c['request']->getUri()->getBasePath()), '/');
-    $view->addExtension(new Slim\Views\TwigExtension($c['router'], $basePath));
+    $view->addExtension(new \Slim\Views\TwigExtension($c['router'], $basePath));
 
     return $view;
 };
@@ -42,6 +42,15 @@ $app->get('/hello/{name}', function ($request, $response, $args) {
         'name' => $args['name']
     ]);
 })->setName('profile');
+
+// Render from string
+$app->get('/hi/{name}', function ($request, $response, $args) {
+    $str = $this->view->fetchFromString('<p>Hi, my name is {{ name }}.</p>', [
+        'name' => $args['name']
+    ]);
+    $response->getBody()->write($str);
+    return $response;
+});
 
 // Run app
 $app->run();
