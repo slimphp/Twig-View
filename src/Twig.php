@@ -85,7 +85,7 @@ class Twig implements \ArrayAccess
     {
         $data = array_merge($this->defaultVariables, $data);
 
-        return $this->environment->loadTemplate($template)->render($data);
+        return $this->environment->render($template, $data);
     }
 
     /**
