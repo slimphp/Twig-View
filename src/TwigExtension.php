@@ -55,9 +55,9 @@ class TwigExtension extends \Twig_Extension
         }
     }
 
-    public function isCurrentPath($name)
+    public function isCurrentPath($name, $data = [])
     {
-        return $this->router->pathFor($name) === $this->uri->getPath();
+        return $this->router->pathFor($name, $data) === $this->uri->getPath();
     }
 
     /**
