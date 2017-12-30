@@ -8,19 +8,27 @@
  */
 namespace Slim\Views;
 
+use \Slim\Router;
+use \Slim\Http\Uri;
+
 class TwigExtension extends \Twig_Extension
 {
     /**
-     * @var \Slim\Interfaces\RouterInterface
+     * @var \Slim\Router
      */
     private $router;
 
     /**
-     * @var string|\Slim\Http\Uri
+     * @var \Slim\Http\Uri
      */
     private $uri;
 
-    public function __construct($router, $uri)
+    /**
+     * @var string Base url from URI instance
+     */
+    protected $baseUrl;
+
+    public function __construct(Router $router, Uri $uri)
     {
         $this->router = $router;
         $this->uri = $uri;
@@ -45,16 +53,27 @@ class TwigExtension extends \Twig_Extension
         return $this->router->pathFor($name, $data, $queryParams);
     }
 
+    /**
+     * Get base URL
+     *
+     * @return string
+     */
     public function baseUrl()
     {
-        if (is_string($this->uri)) {
-            return $this->uri;
-        }
-        if (method_exists($this->uri, 'getBaseUrl')) {
-            return $this->uri->getBaseUrl();
+        if(isset($this->baseUrl)) {
+            return $this->filterBaseUrl($this->baseUrl);
+        } else {
+            return $this->filterBaseUrl($this->uri->getBaseUrl());
         }
     }
 
+    /**
+     * Check if current route is current path
+     *
+     * @param $name Current route
+     * @param array $data
+     * @return bool
+     */
     public function isCurrentPath($name, $data = [])
     {
         return $this->router->pathFor($name, $data) === $this->uri->getPath();
@@ -63,11 +82,22 @@ class TwigExtension extends \Twig_Extension
     /**
      * Set the base url
      *
-     * @param string|Slim\Http\Uri $baseUrl
+     * @param Slim\Http\Uri $baseUrl
      * @return void
      */
     public function setBaseUrl($baseUrl)
     {
-        $this->uri = $baseUrl;
+        $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * Remove index.php from baseUrl
+     *
+     * @param string $baseUrl Getting base URL
+     * @return string Filtered base url
+     */
+    public function filterBaseUrl($baseUrl)
+    {
+        return rtrim(str_ireplace('index.php', '', $baseUrl), '/');
     }
 }
