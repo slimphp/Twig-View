@@ -69,7 +69,11 @@ class TwigExtension extends \Twig_Extension
      */
     public function currentPath($withQueryString = false)
     {
-        $path = $this->uri->getPath();
+        if (is_string($this->uri)) {
+            return $this->uri;
+        }
+
+        $path = $this->uri->getBasePath() . '/' . ltrim($this->uri->getPath(), '/');
 
         if ($withQueryString && '' !== $query = $this->uri->getQuery()) {
             $path .= '?' . $query;
