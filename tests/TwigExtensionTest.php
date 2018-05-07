@@ -43,4 +43,35 @@ class TwigExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function currentPathProvider()
+    {
+        $router = new Router();
+
+        $router->map(['GET'], '/hello/{name}', null)->setName('foo');
+        $uri = Uri::createFromString('http://example.com/hello/world?a=b');
+
+        $uri2 = $uri->withBasePath('bar');
+        $router->map(['GET'], '/bar/hello/{name}', null)->setName('bar');
+
+        return [
+            [$router, '/foo', false, '/foo'],
+            [$router, '/foo', true, '/foo'], // string based URI doesn't care about $withQueryString
+            [$router, $uri, false, '/hello/world'],
+            [$router, $uri, true, '/hello/world?a=b'],
+            [$router, $uri2, false, '/bar/hello/world'],
+            [$router, $uri2, true, '/bar/hello/world?a=b'],
+        ];
+    }
+
+    /**
+     * @dataProvider currentPathProvider
+     */
+    public function testCurrentPath($router, $uri, $withQueryString, $expected)
+    {
+        $extension = new TwigExtension($router, $uri);
+        $result = $extension->currentPath($withQueryString);
+
+        $this->assertEquals($expected, $result);
+    }
 }
