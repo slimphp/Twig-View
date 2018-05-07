@@ -37,6 +37,7 @@ class TwigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('path_for', array($this, 'pathFor')),
             new \Twig_SimpleFunction('base_url', array($this, 'baseUrl')),
             new \Twig_SimpleFunction('is_current_path', array($this, 'isCurrentPath')),
+            new \Twig_SimpleFunction('current_path', array($this, 'currentPath')),
         ];
     }
 
@@ -58,6 +59,27 @@ class TwigExtension extends \Twig_Extension
     public function isCurrentPath($name, $data = [])
     {
         return $this->router->pathFor($name, $data) === $this->uri->getBasePath() . '/' . ltrim($this->uri->getPath(), '/');
+    }
+
+    /**
+     * Returns current path on given URI.
+     *
+     * @param bool $withQueryString
+     * @return string
+     */
+    public function currentPath($withQueryString = false)
+    {
+        if (is_string($this->uri)) {
+            return $this->uri;
+        }
+
+        $path = $this->uri->getBasePath() . '/' . ltrim($this->uri->getPath(), '/');
+
+        if ($withQueryString && '' !== $query = $this->uri->getQuery()) {
+            $path .= '?' . $query;
+        }
+
+        return $path;
     }
 
     /**
