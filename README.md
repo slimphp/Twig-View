@@ -74,7 +74,7 @@ You can use `path_for` to generate complete URLs to any Slim application named r
     {% block body %}
     <h1>User List</h1>
     <ul>
-        <li><a href="{{ path_for('profile', { 'name': 'josh' }) }}" {% if is_current_path('profle', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
+        <li><a href="{{ path_for('profile', { 'name': 'josh' }) }}" {% if is_current_path('profile', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
         <li><a href="{{ path_for('profile', { 'name': 'andrew' }) }}">Andrew</a></li>
     </ul>
     {% endblock %}
