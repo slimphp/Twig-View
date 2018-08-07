@@ -74,4 +74,18 @@ class TwigExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testUrlFor()
+    {
+        $router = new Router();
+        $router->setBasePath('/app');
+        $router->map(['GET'], '/activate/{token}', null)->setName('activate');
+        $uri = Uri::createFromString('http://example.com/app/hello/world?a=b');
+
+        $extension = new TwigExtension($router, $uri);
+        $result = $extension->urlFor('activate', ['token' => 'foo']);
+
+        $expected = 'http://example.com/app/activate/foo';
+        $this->assertEquals($expected, $result);
+    }
 }
