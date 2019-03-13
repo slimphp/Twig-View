@@ -24,14 +24,14 @@ class Twig implements \ArrayAccess
     /**
      * Twig loader
      *
-     * @var \Twig_LoaderInterface
+     * @var \Twig\Loader\LoaderInterface
      */
     protected $loader;
 
     /**
      * Twig environment
      *
-     * @var \Twig_Environment
+     * @var \Twig\Environment
      */
     protected $environment;
 
@@ -55,7 +55,7 @@ class Twig implements \ArrayAccess
     public function __construct($path, $settings = [])
     {
         $this->loader = $this->createLoader(is_string($path) ? [$path] : $path);
-        $this->environment = new \Twig_Environment($this->loader, $settings);
+        $this->environment = new \Twig\Environment($this->loader, $settings);
     }
 
     /********************************************************************************
@@ -65,9 +65,9 @@ class Twig implements \ArrayAccess
     /**
      * Proxy method to add an extension to the Twig environment
      *
-     * @param \Twig_ExtensionInterface $extension A single extension instance or an array of instances
+     * @param \Twig\Extension\ExtensionInterface $extension A single extension instance or an array of instances
      */
-    public function addExtension(\Twig_ExtensionInterface $extension)
+    public function addExtension(\Twig\Extension\ExtensionInterface $extension)
     {
         $this->environment->addExtension($extension);
     }
@@ -138,11 +138,11 @@ class Twig implements \ArrayAccess
      * Create a loader with the given path
      *
      * @param array $paths
-     * @return \Twig_Loader_Filesystem
+     * @return \Twig\Loader\FilesystemLoader
      */
     private function createLoader(array $paths)
     {
-        $loader = new \Twig_Loader_Filesystem();
+        $loader = new \Twig\Loader\FilesystemLoader();
 
         foreach ($paths as $namespace => $path) {
             if (is_string($namespace)) {
@@ -162,7 +162,7 @@ class Twig implements \ArrayAccess
     /**
      * Return Twig loader
      *
-     * @return \Twig_LoaderInterface
+     * @return \Twig\Loader\LoaderInterface
      */
     public function getLoader()
     {
@@ -172,7 +172,7 @@ class Twig implements \ArrayAccess
     /**
      * Return Twig environment
      *
-     * @return \Twig_Environment
+     * @return \Twig\Environment
      */
     public function getEnvironment()
     {
