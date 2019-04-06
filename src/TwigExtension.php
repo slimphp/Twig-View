@@ -8,7 +8,7 @@
  */
 namespace Slim\Views;
 
-class TwigExtension extends \Twig_Extension
+class TwigExtension extends \Twig\Extension\AbstractExtension
 {
     /**
      * @var \Slim\Interfaces\RouterInterface
@@ -34,10 +34,10 @@ class TwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('path_for', array($this, 'pathFor')),
-            new \Twig_SimpleFunction('base_url', array($this, 'baseUrl')),
-            new \Twig_SimpleFunction('is_current_path', array($this, 'isCurrentPath')),
-            new \Twig_SimpleFunction('current_path', array($this, 'currentPath')),
+            new \Twig\TwigFunction('path_for', array($this, 'pathFor')),
+            new \Twig\TwigFunction('base_url', array($this, 'baseUrl')),
+            new \Twig\TwigFunction('is_current_path', array($this, 'isCurrentPath')),
+            new \Twig\TwigFunction('current_path', array($this, 'currentPath')),
         ];
     }
 
