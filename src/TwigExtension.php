@@ -37,7 +37,7 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
     {
         return [
             new \Twig\TwigFunction('path_for', array($this, 'pathFor')),
-            new \Twig\TwigFunction('url_for', array($this, 'urlFor')),
+            new \Twig\TwigFunction('full_url_for', array($this, 'fullUrlFor')),
             new \Twig\TwigFunction('base_url', array($this, 'baseUrl')),
             new \Twig\TwigFunction('is_current_path', array($this, 'isCurrentPath')),
             new \Twig\TwigFunction('current_path', array($this, 'currentPath')),
@@ -58,12 +58,12 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
      * @param string $appName
      * @return string fully qualified URL
      */
-    public function urlFor($name, $data = [], $queryParams = [], $appName = 'default')
+    public function fullUrlFor($name, $data = [], $queryParams = [], $appName = 'default')
     {
         $path = $this->pathFor($name, $data, $queryParams, $appName);
 
         /** @var Uri $uri */
-        if(is_string($this->uri)) {
+        if (is_string($this->uri)) {
             $uri = Uri::createFromString($this->uri);
         } else {
             $uri = $this->uri;
