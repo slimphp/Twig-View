@@ -79,9 +79,9 @@ class Twig implements \ArrayAccess
      * @param  string $template Template pathname relative to templates directory
      * @param  array  $data     Associative array of template variables
      *
-     * @throws Twig_Error_Loader  When the template cannot be found
-     * @throws Twig_Error_Syntax  When an error occurred during compilation
-     * @throws Twig_Error_Runtime When an error occurred during rendering
+     * @throws \Twig\Error\LoaderError  When the template cannot be found
+     * @throws \Twig_Error\SyntaxError  When an error occurred during compilation
+     * @throws \Twig_Error\RuntimeError When an error occurred during rendering
      *
      * @return string
      */
