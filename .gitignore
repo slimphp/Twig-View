@@ -1,2 +1,5 @@
+.idea
 composer.lock
+clover.xml
+coverage
 vendor
