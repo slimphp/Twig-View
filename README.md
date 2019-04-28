@@ -23,6 +23,8 @@ use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
 
+require __DIR__ . '/vendor/autoload.php';
+
 // Create Container
 $container = new Container();
 AppFactory::setContainer($container);
@@ -31,10 +33,10 @@ AppFactory::setContainer($container);
 $app = new AppFactory::create();
 
 // Add Twig-View Middleware
-$baseUrl = 'http://www.yourwebsite.com';
+$basePath = '/base-path';
 $routeParser = $app->getRouteCollector()->getRouteParser();
 $twig = new Twig('path/to/templates', ['cache' => 'path/to/cache']);
-$twigMiddleware = new TwigMiddleware($twig, $container, $routeParser, $baseUrl);
+$twigMiddleware = new TwigMiddleware($twig, $container, $routeParser, $basePath);
 $app->add($twigMiddleware);
 
 // Define named route
@@ -61,12 +63,11 @@ $app->run();
 
 `TwigExtension` provides these functions to your Twig templates:
 
-* `base_url()` - returns the base URL from the incoming Request object
-* `current_url()` - returns the current path, with or without the query string.
-* `is_current_url()` - returns true is the provided route name and parameters are valid for the current path.
 * `url_for()` - returns the URL for a given route. e.g.: /hello/world
 * `full_url_for()` - returns the URL for a given route. e.g.: http://www.example.com/hello/world
-
+* `is_current_url()` - returns true is the provided route name and parameters are valid for the current path.
+* `current_url()` - returns the current path, with or without the query string.
+* `get_uri()` - returns the `UriInterface` object from the incoming `ServerRequestInterface` object
 
 You can use `url_for` to generate complete URLs to any Slim application named route and use `is_current_url` to determine if you need to mark a link as active as shown in this example Twig template:
 
