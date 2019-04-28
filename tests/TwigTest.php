@@ -2,17 +2,18 @@
 /**
  * Slim Framework (http://slimframework.com)
  *
- * @link      https://github.com/codeguy/Slim
- * @copyright Copyright (c) 2011-2015 Josh Lockhart
- * @license   https://github.com/codeguy/Slim/blob/master/LICENSE (MIT License)
+ * @license   https://github.com/slimphp/Twig-View/blob/master/LICENSE.md (MIT License)
  */
-namespace Slim\Tests\Views;
 
+declare(strict_types=1);
+
+namespace Slim\Tests;
+
+use DateTimeImmutable;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
-
-class TwigTest extends \PHPUnit_Framework_TestCase
+class TwigTest extends TestCase
 {
     public function testFetch()
     {
@@ -54,7 +55,7 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleNamespaceAndMultipleDirectories()
     {
-        $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
+        $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
 
         $view = new Twig(
             [
@@ -114,7 +115,7 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleTemplatesWithMultipleNamespace()
     {
-        $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
+        $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
 
         $views = new Twig([
             'One'   => __DIR__.'/templates',
@@ -144,7 +145,7 @@ class TwigTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleDirectoriesWithoutNamespaces()
     {
-        $weekday = (new \DateTimeImmutable('2016-03-08'))->format('l');
+        $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
         $view    = new Twig([__DIR__.'/multi/', __DIR__.'/another/']);
 
         $rootDirectory = $view->fetch('directory/template/example.html', [
@@ -183,6 +184,6 @@ class TwigTest extends \PHPUnit_Framework_TestCase
         $response = $view->render($mockResponse, 'example.html', [
             'name' => 'Josh'
         ]);
-        $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $response);
+        $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 }
