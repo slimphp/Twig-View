@@ -59,9 +59,9 @@ class TwigExtension extends AbstractExtension
         return [
             new TwigFunction('url_for', [$this, 'urlFor']),
             new TwigFunction('full_url_for', [$this, 'fullUrlFor']),
-            new TwigFunction('base_url', [$this, 'getBaseUrl']),
             new TwigFunction('is_current_url', [$this, 'isCurrentUrl']),
             new TwigFunction('current_url', [$this, 'getCurrentUrl']),
+            new TwigFunction('get_uri', [$this, 'getUri']),
         ];
     }
 
@@ -156,7 +156,7 @@ class TwigExtension extends AbstractExtension
      *
      * @return self
      */
-    public function setBasePath($basePath): self
+    public function setBasePath(string $basePath): self
     {
         $this->basePath = $basePath;
         return $this;
