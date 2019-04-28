@@ -9,33 +9,35 @@ This is a Slim Framework view helper built on top of the Twig templating compone
 Via [Composer](https://getcomposer.org/)
 
 ```bash
-$ composer require slim/twig-view
+$ composer require slim/twig-view:3.0.0-alpha
 ```
 
-Requires Slim Framework 3 and PHP 5.5.0 or newer.
+Requires Slim Framework 4 and PHP 7.1 or newer.
 
 ## Usage
 
 ```php
-// Create Slim app
-$app = new \Slim\App();
+use DI\Container;
+use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
+use Slim\Views\TwigExtension;
+use Slim\Views\TwigMiddleware;
 
-// Fetch DI Container
-$container = $app->getContainer();
+require __DIR__ . '/vendor/autoload.php';
 
-// Register Twig View helper
-$container['view'] = function ($c) {
-    $view = new \Slim\Views\Twig('path/to/templates', [
-        'cache' => 'path/to/cache'
-    ]);
-    
-    // Instantiate and add Slim specific extension
-    $router = $c->get('router');
-    $uri = \Slim\Http\Uri::createFromEnvironment(new \Slim\Http\Environment($_SERVER));
-    $view->addExtension(new \Slim\Views\TwigExtension($router, $uri));
+// Create Container
+$container = new Container();
+AppFactory::setContainer($container);
 
-    return $view;
-};
+// Create App
+$app = new AppFactory::create();
+
+// Add Twig-View Middleware
+$basePath = '/base-path';
+$routeParser = $app->getRouteCollector()->getRouteParser();
+$twig = new Twig('path/to/templates', ['cache' => 'path/to/cache']);
+$twigMiddleware = new TwigMiddleware($twig, $container, $routeParser, $basePath);
+$app->add($twigMiddleware);
 
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {
@@ -61,29 +63,33 @@ $app->run();
 
 `TwigExtension` provides these functions to your Twig templates:
 
-* `path_for()` - returns the URL for a given route.
-* `base_url()` - returns the `Uri` object's base URL.
-* `is_current_path()` - returns true is the provided route name and parameters are valid for the current path.
-* `current_path()` - renders the current path, with or without the query string.
+* `url_for()` - returns the URL for a given route. e.g.: /hello/world
+* `full_url_for()` - returns the URL for a given route. e.g.: http://www.example.com/hello/world
+* `is_current_url()` - returns true is the provided route name and parameters are valid for the current path.
+* `current_url()` - returns the current path, with or without the query string.
+* `get_uri()` - returns the `UriInterface` object from the incoming `ServerRequestInterface` object
 
-
-You can use `path_for` to generate complete URLs to any Slim application named route and use `is_current_path` to determine if you need to mark a link as active as shown in this example Twig template:
+You can use `url_for` to generate complete URLs to any Slim application named route and use `is_current_url` to determine if you need to mark a link as active as shown in this example Twig template:
 
     {% extends "layout.html" %}
 
     {% block body %}
     <h1>User List</h1>
     <ul>
-        <li><a href="{{ path_for('profile', { 'name': 'josh' }) }}" {% if is_current_path('profile', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
-        <li><a href="{{ path_for('profile', { 'name': 'andrew' }) }}">Andrew</a></li>
+        <li><a href="{{ url_for('profile', { 'name': 'josh' }) }}" {% if is_current_url('profile', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
+        <li><a href="{{ url_for('profile', { 'name': 'andrew' }) }}">Andrew</a></li>
     </ul>
     {% endblock %}
 
 
-## Testing
+## Tests
+
+To execute the test suite, you'll need to clone the repository and install the dependencies.
 
 ```bash
-phpunit
+$ git clone https://github.com/slimphp/Twig-View
+$ composer install
+$ composer test
 ```
 
 ## Contributing
@@ -97,6 +103,7 @@ If you discover any security related issues, please email security@slimframework
 ## Credits
 
 - [Josh Lockhart](https://github.com/codeguy)
+- [Pierre Bérubé](https://github.com/l0gicgate)
 
 ## License
 

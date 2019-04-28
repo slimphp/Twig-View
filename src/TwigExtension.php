@@ -2,126 +2,163 @@
 /**
  * Slim Framework (http://slimframework.com)
  *
- * @link      https://github.com/slimphp/Twig-View
- * @copyright Copyright (c) 2011-2015 Josh Lockhart
  * @license   https://github.com/slimphp/Twig-View/blob/master/LICENSE.md (MIT License)
  */
+
+declare(strict_types=1);
+
 namespace Slim\Views;
 
-use Slim\Http\Uri;
+use Psr\Http\Message\UriInterface;
+use Slim\Interfaces\RouteParserInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TwigExtension extends \Twig\Extension\AbstractExtension
+class TwigExtension extends AbstractExtension
 {
     /**
-     * @var \Slim\Interfaces\RouterInterface
+     * @var RouteParserInterface
      */
-    private $router;
+    protected $routeParser;
 
     /**
-     * @var string|\Slim\Http\Uri
+     * @var string
      */
-    private $uri;
+    protected $basePath = '';
 
-    public function __construct($router, $uri)
+    /**
+     * @var UriInterface
+     */
+    protected $uri;
+
+    /**
+     * @param RouteParserInterface $routeParser
+     * @param UriInterface         $uri
+     * @param string               $basePath
+     */
+    public function __construct(RouteParserInterface $routeParser, UriInterface $uri, string $basePath = '')
     {
-        $this->router = $router;
+        $this->routeParser = $routeParser;
         $this->uri = $uri;
+        $this->basePath = $basePath;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return 'slim';
     }
 
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions()
     {
         return [
-            new \Twig\TwigFunction('path_for', array($this, 'pathFor')),
-            new \Twig\TwigFunction('full_url_for', array($this, 'fullUrlFor')),
-            new \Twig\TwigFunction('base_url', array($this, 'baseUrl')),
-            new \Twig\TwigFunction('is_current_path', array($this, 'isCurrentPath')),
-            new \Twig\TwigFunction('current_path', array($this, 'currentPath')),
+            new TwigFunction('url_for', [$this, 'urlFor']),
+            new TwigFunction('full_url_for', [$this, 'fullUrlFor']),
+            new TwigFunction('is_current_url', [$this, 'isCurrentUrl']),
+            new TwigFunction('current_url', [$this, 'getCurrentUrl']),
+            new TwigFunction('get_uri', [$this, 'getUri']),
         ];
     }
 
-    public function pathFor($name, $data = [], $queryParams = [], $appName = 'default')
+    /**
+     * @param string $routeName
+     * @param array  $data
+     * @param array  $queryParams
+     *
+     * @return string
+     */
+    public function urlFor(string $routeName, array $data = [], $queryParams = [])
     {
-        return $this->router->pathFor($name, $data, $queryParams);
+        return $this->routeParser->urlFor($routeName, $data, $queryParams);
     }
 
     /**
-     * Similar to pathFor but returns a fully qualified URL
+     * @param string $routeName   Route placeholders
+     * @param array  $data        Route placeholders
+     * @param array  $queryParams
      *
-     * @param string $name The name of the route
-     * @param array $data Route placeholders
-     * @param array $queryParams
-     * @param string $appName
-     * @return string fully qualified URL
+     * @return string
      */
-    public function fullUrlFor($name, $data = [], $queryParams = [], $appName = 'default')
+    public function fullUrlFor(string $routeName, array $data = [], array $queryParams = [])
     {
-        $path = $this->pathFor($name, $data, $queryParams, $appName);
-
-        /** @var Uri $uri */
-        if (is_string($this->uri)) {
-            $uri = Uri::createFromString($this->uri);
-        } else {
-            $uri = $this->uri;
-        }
-
-        $scheme = $uri->getScheme();
-        $authority = $uri->getAuthority();
-
-        $host = ($scheme ? $scheme . ':' : '')
-            . ($authority ? '//' . $authority : '');
-
-        return $host.$path;
+        return $this->routeParser->fullUrlFor($this->uri, $routeName, $data, $queryParams);
     }
 
-    public function baseUrl()
+    /**
+     * @param string $routeName
+     * @param array  $data
+     *
+     * @return bool
+     */
+    public function isCurrentUrl(string $routeName, $data = []): bool
     {
-        if (is_string($this->uri)) {
-            return $this->uri;
-        }
-        if (method_exists($this->uri, 'getBaseUrl')) {
-            return $this->uri->getBaseUrl();
-        }
-    }
+        $currentUrl = $this->basePath . $this->uri->getPath();
+        $result = $this->routeParser->urlFor($routeName, $data) ;
 
-    public function isCurrentPath($name, $data = [])
-    {
-        return $this->router->pathFor($name, $data) === $this->uri->getBasePath() . '/' . ltrim($this->uri->getPath(), '/');
+        return $result === $currentUrl;
     }
 
     /**
      * Returns current path on given URI.
      *
      * @param bool $withQueryString
+     *
      * @return string
      */
-    public function currentPath($withQueryString = false)
+    public function getCurrentUrl($withQueryString = false)
     {
-        if (is_string($this->uri)) {
-            return $this->uri;
+        $currentUrl = $this->basePath . $this->uri->getPath();
+        $query = $this->uri->getQuery();
+
+        if ($withQueryString && !empty($query)) {
+            $currentUrl .= '?' . $query;
         }
 
-        $path = $this->uri->getBasePath() . '/' . ltrim($this->uri->getPath(), '/');
+        return $currentUrl;
+    }
 
-        if ($withQueryString && '' !== $query = $this->uri->getQuery()) {
-            $path .= '?' . $query;
-        }
+    /**
+     * @return UriInterface
+     */
+    public function getUri(): UriInterface
+    {
+        return $this->uri;
+    }
 
-        return $path;
+    /**
+     * @param UriInterface $uri
+     *
+     * @return self
+     */
+    public function setUri(UriInterface $uri): self
+    {
+        $this->uri = $uri;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBasePath(): string
+    {
+        return $this->basePath;
     }
 
     /**
      * Set the base url
      *
-     * @param string|Slim\Http\Uri $baseUrl
-     * @return void
+     * @param string $basePath
+     *
+     * @return self
      */
-    public function setBaseUrl($baseUrl)
+    public function setBasePath(string $basePath): self
     {
-        $this->uri = $baseUrl;
+        $this->basePath = $basePath;
+        return $this;
     }
 }

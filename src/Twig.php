@@ -2,36 +2,45 @@
 /**
  * Slim Framework (http://slimframework.com)
  *
- * @link      https://github.com/slimphp/Twig-View
- * @copyright Copyright (c) 2011-2015 Josh Lockhart
  * @license   https://github.com/slimphp/Twig-View/blob/master/LICENSE.md (MIT License)
  */
+
+declare(strict_types=1);
+
 namespace Slim\Views;
 
+use ArrayAccess;
+use ArrayIterator;
 use Psr\Http\Message\ResponseInterface;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Extension\ExtensionInterface;
+use Twig\Loader\FilesystemLoader;
+use Twig\Loader\LoaderInterface;
 
 /**
  * Twig View
  *
- * This class is a Slim Framework view helper built
- * on top of the Twig templating component. Twig is
- * a PHP component created by Fabien Potencier.
+ * This class is a Slim Framework view helper built on top of the Twig templating component.
+ * Twig is a PHP component created by Fabien Potencier.
  *
  * @link http://twig.sensiolabs.org/
  */
-class Twig implements \ArrayAccess
+class Twig implements ArrayAccess
 {
     /**
      * Twig loader
      *
-     * @var \Twig\Loader\LoaderInterface
+     * @var LoaderInterface
      */
     protected $loader;
 
     /**
      * Twig environment
      *
-     * @var \Twig\Environment
+     * @var Environment
      */
     protected $environment;
 
@@ -42,36 +51,25 @@ class Twig implements \ArrayAccess
      */
     protected $defaultVariables = [];
 
-    /********************************************************************************
-     * Constructors and service provider registration
-     *******************************************************************************/
-
     /**
-     * Create new Twig view
-     *
      * @param string|array $path     Path(s) to templates directory
      * @param array        $settings Twig environment settings
      */
     public function __construct($path, $settings = [])
     {
         $this->loader = $this->createLoader(is_string($path) ? [$path] : $path);
-        $this->environment = new \Twig\Environment($this->loader, $settings);
+        $this->environment = new Environment($this->loader, $settings);
     }
-
-    /********************************************************************************
-     * Methods
-     *******************************************************************************/
 
     /**
      * Proxy method to add an extension to the Twig environment
      *
-     * @param \Twig\Extension\ExtensionInterface $extension A single extension instance or an array of instances
+     * @param ExtensionInterface $extension A single extension instance or an array of instances
      */
-    public function addExtension(\Twig\Extension\ExtensionInterface $extension)
+    public function addExtension(ExtensionInterface $extension)
     {
         $this->environment->addExtension($extension);
     }
-
 
     /**
      * Fetch rendered template
@@ -79,13 +77,13 @@ class Twig implements \ArrayAccess
      * @param  string $template Template pathname relative to templates directory
      * @param  array  $data     Associative array of template variables
      *
-     * @throws \Twig\Error\LoaderError  When the template cannot be found
-     * @throws \Twig_Error\SyntaxError  When an error occurred during compilation
-     * @throws \Twig_Error\RuntimeError When an error occurred during rendering
+     * @throws LoaderError  When the template cannot be found
+     * @throws SyntaxError  When an error occurred during compilation
+     * @throws RuntimeError When an error occurred during rendering
      *
      * @return string
      */
-    public function fetch($template, $data = [])
+    public function fetch(string $template, array $data = [])
     {
         $data = array_merge($this->defaultVariables, $data);
 
@@ -101,7 +99,7 @@ class Twig implements \ArrayAccess
      *
      * @return string
      */
-    public function fetchBlock($template, $block, $data = [])
+    public function fetchBlock(string $template, string $block, array $data = [])
     {
         $data = array_merge($this->defaultVariables, $data);
 
@@ -116,7 +114,7 @@ class Twig implements \ArrayAccess
      *
      * @return string
      */
-    public function fetchFromString($string ="", $data = [])
+    public function fetchFromString(string $string = '', array $data = [])
     {
         $data = array_merge($this->defaultVariables, $data);
 
@@ -126,12 +124,12 @@ class Twig implements \ArrayAccess
     /**
      * Output rendered template
      *
-     * @param ResponseInterface $response
-     * @param  string $template Template pathname relative to templates directory
-     * @param  array $data Associative array of template variables
+     * @param  ResponseInterface $response
+     * @param  string            $template Template pathname relative to templates directory
+     * @param  array             $data Associative array of template variables
      * @return ResponseInterface
      */
-    public function render(ResponseInterface $response, $template, $data = [])
+    public function render(ResponseInterface $response, string $template, array $data = [])
     {
          $response->getBody()->write($this->fetch($template, $data));
 
@@ -142,11 +140,11 @@ class Twig implements \ArrayAccess
      * Create a loader with the given path
      *
      * @param array $paths
-     * @return \Twig\Loader\FilesystemLoader
+     * @return FilesystemLoader
      */
     private function createLoader(array $paths)
     {
-        $loader = new \Twig\Loader\FilesystemLoader();
+        $loader = new FilesystemLoader();
 
         foreach ($paths as $namespace => $path) {
             if (is_string($namespace)) {
@@ -159,16 +157,12 @@ class Twig implements \ArrayAccess
         return $loader;
     }
 
-    /********************************************************************************
-     * Accessors
-     *******************************************************************************/
-
     /**
      * Return Twig loader
      *
-     * @return \Twig\Loader\LoaderInterface
+     * @return LoaderInterface
      */
-    public function getLoader()
+    public function getLoader(): LoaderInterface
     {
         return $this->loader;
     }
@@ -176,16 +170,12 @@ class Twig implements \ArrayAccess
     /**
      * Return Twig environment
      *
-     * @return \Twig\Environment
+     * @return Environment
      */
-    public function getEnvironment()
+    public function getEnvironment(): Environment
     {
         return $this->environment;
     }
-
-    /********************************************************************************
-     * ArrayAccess interface
-     *******************************************************************************/
 
     /**
      * Does this collection have a given key?
@@ -232,10 +222,6 @@ class Twig implements \ArrayAccess
         unset($this->defaultVariables[$key]);
     }
 
-    /********************************************************************************
-     * Countable interface
-     *******************************************************************************/
-
     /**
      * Get number of items in collection
      *
@@ -246,17 +232,13 @@ class Twig implements \ArrayAccess
         return count($this->defaultVariables);
     }
 
-    /********************************************************************************
-     * IteratorAggregate interface
-     *******************************************************************************/
-
     /**
      * Get collection iterator
      *
-     * @return \ArrayIterator
+     * @return ArrayIterator
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->defaultVariables);
+        return new ArrayIterator($this->defaultVariables);
     }
 }

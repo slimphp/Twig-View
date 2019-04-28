@@ -2,90 +2,111 @@
 /**
  * Slim Framework (http://slimframework.com)
  *
- * @link      https://github.com/codeguy/Slim
- * @copyright Copyright (c) 2011-2015 Josh Lockhart
- * @license   https://github.com/codeguy/Slim/blob/master/LICENSE (MIT License)
+ * @license   https://github.com/slimphp/Twig-View/blob/master/LICENSE.md (MIT License)
  */
-namespace Slim\Tests\Views;
 
-use Slim\Http\Uri;
-use Slim\Router;
+declare(strict_types=1);
+
+namespace Slim\Tests;
+
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\UriInterface;
+use Slim\Interfaces\CallableResolverInterface;
+use Slim\Routing\RouteCollector;
 use Slim\Views\TwigExtension;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
-
-class TwigExtensionTest extends \PHPUnit_Framework_TestCase
+class TwigExtensionTest extends TestCase
 {
-    public function isCurrentPathProvider()
+    public function isCurrentUrlProvider()
     {
-        $router = new Router();
-
-        $router->map(['GET'], '/hello/{name}', null)->setName('foo');
-        $uri = Uri::createFromString('http://example.com/hello/world');
-
-        $uri2 = $uri->withBasePath('bar');
-        $router->map(['GET'], '/bar/hello/{name}', null)->setName('bar');
-
         return [
-            [$router, $uri, 'foo', ['name' => 'world'], true],
-            [$router, $uri2, 'bar', ['name' => 'world'], true],
-            [$router, $uri, 'bar', ['name' => 'world'], false],
+            ['/hello/{name}', ['name' => 'world'], '/hello/world', '/base-path', true],
+            ['/hello/{name}', ['name' => 'world'], '/hello/world', '', true],
+            ['/hello/{name}', ['name' => 'world'], '/hello/john', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/hello/john', '', false],
         ];
     }
 
     /**
-     * @dataProvider isCurrentPathProvider
+     * @dataProvider isCurrentUrlProvider
      */
-    public function testIsCurrentPath($router, $uri, $name, $data, $expected)
+    public function testIsCurrentUrl(string $pattern, array $data, string $path, ?string $basePath, bool $expected)
     {
-        $extension = new TwigExtension($router, $uri);
-        $result = $extension->isCurrentPath($name, $data);
+        $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
+        $callableResolverProphecy = $this->prophesize(CallableResolverInterface::class);
+
+        $routeCollector = new RouteCollector($responseFactoryProphecy->reveal(), $callableResolverProphecy->reveal());
+        $routeParser = $routeCollector->getRouteParser();
+
+        if ($basePath) {
+            $routeCollector->setBasePath($basePath);
+        }
+
+        $routeName = 'route';
+        $route = $routeCollector->map(['GET'], $pattern, 'handler');
+        $route->setName($routeName);
+
+        $uriProphecy = $this->prophesize(UriInterface::class);
+
+        $uriProphecy
+            ->getPath()
+            ->willReturn($path)
+            ->shouldBeCalledOnce();
+
+        $extension = new TwigExtension($routeParser, $uriProphecy->reveal(), $basePath);
+        $result = $extension->isCurrentUrl($routeName, $data);
 
         $this->assertEquals($expected, $result);
     }
 
-    public function currentPathProvider()
+    public function currentUrlProvider()
     {
-        $router = new Router();
-
-        $router->map(['GET'], '/hello/{name}', null)->setName('foo');
-        $uri = Uri::createFromString('http://example.com/hello/world?a=b');
-
-        $uri2 = $uri->withBasePath('bar');
-        $router->map(['GET'], '/bar/hello/{name}', null)->setName('bar');
-
         return [
-            [$router, '/foo', false, '/foo'],
-            [$router, '/foo', true, '/foo'], // string based URI doesn't care about $withQueryString
-            [$router, $uri, false, '/hello/world'],
-            [$router, $uri, true, '/hello/world?a=b'],
-            [$router, $uri2, false, '/bar/hello/world'],
-            [$router, $uri2, true, '/bar/hello/world?a=b'],
+            ['/hello/{name}', 'http://example.com/hello/world?a=b', '', true],
+            ['/hello/{name}', 'http://example.com/hello/world', '', false],
+            ['/base-path/hello/{name}', 'http://example.com/base-path/hello/world?a=b', '/base-path', true],
+            ['/base-path/hello/{name}', 'http://example.com/base-path/hello/world', '/base-path', false],
         ];
     }
 
     /**
-     * @dataProvider currentPathProvider
+     * @dataProvider currentUrlProvider
      */
-    public function testCurrentPath($router, $uri, $withQueryString, $expected)
+    public function testCurrentUrl(string $pattern, string $url, string $basePath, bool $withQueryString)
     {
-        $extension = new TwigExtension($router, $uri);
-        $result = $extension->currentPath($withQueryString);
+        $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
+        $callableResolverProphecy = $this->prophesize(CallableResolverInterface::class);
 
-        $this->assertEquals($expected, $result);
-    }
+        $routeCollector = new RouteCollector($responseFactoryProphecy->reveal(), $callableResolverProphecy->reveal());
+        $routeParser = $routeCollector->getRouteParser();
 
-    public function testFullUrlFor()
-    {
-        $router = new Router();
-        $router->setBasePath('/app');
-        $router->map(['GET'], '/activate/{token}', null)->setName('activate');
-        $uri = Uri::createFromString('http://example.com/app/hello/world?a=b');
+        $routeName = 'route';
+        $route = $routeCollector->map(['GET'], $pattern, 'handler');
+        $route->setName($routeName);
 
-        $extension = new TwigExtension($router, $uri);
-        $result = $extension->fullUrlFor('activate', ['token' => 'foo']);
+        $uriProphecy = $this->prophesize(UriInterface::class);
 
-        $expected = 'http://example.com/app/activate/foo';
+        $path = parse_url($url, PHP_URL_PATH);
+        $query = parse_url($url, PHP_URL_QUERY);
+
+        $uriProphecy
+            ->getPath()
+            ->willReturn($path)
+            ->shouldBeCalledOnce();
+
+        $uriProphecy
+            ->getQuery()
+            ->willReturn($query)
+            ->shouldBeCalledOnce();
+
+        $expected = $basePath . $path;
+        if ($withQueryString) {
+            $expected .= '?' . $query;
+        }
+
+        $extension = new TwigExtension($routeParser, $uriProphecy->reveal(), $basePath);
+        $result = $extension->getCurrentUrl($withQueryString);
+
         $this->assertEquals($expected, $result);
     }
 }
