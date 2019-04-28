@@ -1,7 +1,7 @@
 {
     "name": "slim/twig-view",
     "type": "library",
-    "description": "Slim Framework 3 view helper built on top of the Twig 2 templating component",
+    "description": "Slim Framework 4 view helper built on top of the Twig 2 templating component",
     "keywords": ["slim","framework","view","template","twig"],
     "homepage": "http://slimframework.com",
     "license": "MIT",
@@ -10,20 +10,28 @@
             "name": "Josh Lockhart",
             "email": "hello@joshlockhart.com",
             "homepage": "http://joshlockhart.com"
+        },
+        {
+            "name": "Pierre Berube",
+            "email": "pierre@lgse.com",
+            "homepage": "http://www.lgse.com"
         }
     ],
     "require": {
-        "php": ">=5.5.0",
-        "twig/twig": "^1.38|^2.7",
-        "psr/http-message": "^1.0"
+        "php": "^7.1",
+        "psr/http-message": "^1.0",
+        "twig/twig": "^2.8"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8|^5.7",
-        "slim/slim": "^3.10"
+        "phpunit/phpunit": "^7.5",
+        "php-di/php-di": "^6.0",
+        "psr/http-factory": "^1.0",
+        "slim/slim": "^4.0.0-alpha"
     },
     "autoload": {
         "psr-4": {
-            "Slim\\Views\\": "src"
+            "Slim\\Views\\": "src",
+            "Slim\\Tests\\": "tests"
         }
     }
 }
