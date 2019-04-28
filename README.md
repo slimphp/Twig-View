@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/slimphp/Twig-View.svg?branch=master)](https://travis-ci.org/slimphp/Twig-View)
 
-This is a Slim Framework view helper built on top of the Twig templating component. You can use this component to create and render templates in your Slim Framework application. It works with Twig 1.18+ (PHP5.5+) and with Twig 2 (PHP7).
+This is a Slim Framework view helper built on top of the Twig templating component. You can use this component to create and render templates in your Slim Framework application. It works with Twig 2 and PHP 7.1 or newer.
 
 ## Install
 
@@ -71,16 +71,17 @@ $app->run();
 
 You can use `url_for` to generate complete URLs to any Slim application named route and use `is_current_url` to determine if you need to mark a link as active as shown in this example Twig template:
 
-    {% extends "layout.html" %}
+```php
+{% extends "layout.html" %}
 
-    {% block body %}
-    <h1>User List</h1>
-    <ul>
-        <li><a href="{{ url_for('profile', { 'name': 'josh' }) }}" {% if is_current_url('profile', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
-        <li><a href="{{ url_for('profile', { 'name': 'andrew' }) }}">Andrew</a></li>
-    </ul>
-    {% endblock %}
-
+{% block body %}
+<h1>User List</h1>
+<ul>
+    <li><a href="{{ url_for('profile', { 'name': 'josh' }) }}" {% if is_current_url('profile', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
+    <li><a href="{{ url_for('profile', { 'name': 'andrew' }) }}">Andrew</a></li>
+</ul>
+{% endblock %}
+```
 
 ## Tests
 
