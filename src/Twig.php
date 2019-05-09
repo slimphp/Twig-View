@@ -12,6 +12,7 @@ namespace Slim\Views;
 use ArrayAccess;
 use ArrayIterator;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -54,8 +55,10 @@ class Twig implements ArrayAccess
     /**
      * @param string|array $path     Path(s) to templates directory
      * @param array        $settings Twig environment settings
+     *
+     * @throws LoaderError When the template cannot be found
      */
-    public function __construct($path, $settings = [])
+    public function __construct($path, array $settings = [])
     {
         $this->loader = $this->createLoader(is_string($path) ? [$path] : $path);
         $this->environment = new Environment($this->loader, $settings);
@@ -66,7 +69,7 @@ class Twig implements ArrayAccess
      *
      * @param ExtensionInterface $extension A single extension instance or an array of instances
      */
-    public function addExtension(ExtensionInterface $extension)
+    public function addExtension(ExtensionInterface $extension): void
     {
         $this->environment->addExtension($extension);
     }
@@ -83,7 +86,7 @@ class Twig implements ArrayAccess
      *
      * @return string
      */
-    public function fetch(string $template, array $data = [])
+    public function fetch(string $template, array $data = []): string
     {
         $data = array_merge($this->defaultVariables, $data);
 
@@ -97,13 +100,17 @@ class Twig implements ArrayAccess
      * @param  string $block    Name of the block within the template
      * @param  array  $data     Associative array of template variables
      *
+     * @throws Throwable   When an error occurred during rendering
+     * @throws LoaderError When the template cannot be found
+     * @throws SyntaxError When an error occurred during compilation
+     *
      * @return string
      */
-    public function fetchBlock(string $template, string $block, array $data = [])
+    public function fetchBlock(string $template, string $block, array $data = []): string
     {
         $data = array_merge($this->defaultVariables, $data);
 
-        return $this->environment->loadTemplate($template)->renderBlock($block, $data);
+        return $this->environment->resolveTemplate($template)->renderBlock($block, $data);
     }
 
     /**
@@ -112,9 +119,12 @@ class Twig implements ArrayAccess
      * @param  string $string String
      * @param  array  $data   Associative array of template variables
      *
+     * @throws LoaderError When the template cannot be found
+     * @throws SyntaxError When an error occurred during compilation
+     *
      * @return string
      */
-    public function fetchFromString(string $string = '', array $data = [])
+    public function fetchFromString(string $string = '', array $data = []): string
     {
         $data = array_merge($this->defaultVariables, $data);
 
@@ -127,9 +137,14 @@ class Twig implements ArrayAccess
      * @param  ResponseInterface $response
      * @param  string            $template Template pathname relative to templates directory
      * @param  array             $data Associative array of template variables
+     *
+     * @throws LoaderError  When the template cannot be found
+     * @throws SyntaxError  When an error occurred during compilation
+     * @throws RuntimeError When an error occurred during rendering
+     *
      * @return ResponseInterface
      */
-    public function render(ResponseInterface $response, string $template, array $data = [])
+    public function render(ResponseInterface $response, string $template, array $data = []): ResponseInterface
     {
          $response->getBody()->write($this->fetch($template, $data));
 
@@ -140,9 +155,12 @@ class Twig implements ArrayAccess
      * Create a loader with the given path
      *
      * @param array $paths
+     *
+     * @throws LoaderError When the template cannot be found
+     *
      * @return FilesystemLoader
      */
-    private function createLoader(array $paths)
+    private function createLoader(array $paths): FilesystemLoader
     {
         $loader = new FilesystemLoader();
 
@@ -184,7 +202,7 @@ class Twig implements ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return array_key_exists($key, $this->defaultVariables);
     }
@@ -207,7 +225,7 @@ class Twig implements ArrayAccess
      * @param string $key   The data key
      * @param mixed  $value The data value
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         $this->defaultVariables[$key] = $value;
     }
@@ -217,7 +235,7 @@ class Twig implements ArrayAccess
      *
      * @param string $key The data key
      */
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         unset($this->defaultVariables[$key]);
     }
@@ -227,7 +245,7 @@ class Twig implements ArrayAccess
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->defaultVariables);
     }
@@ -237,7 +255,7 @@ class Twig implements ArrayAccess
      *
      * @return ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->defaultVariables);
     }
