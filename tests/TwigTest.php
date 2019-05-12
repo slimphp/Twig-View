@@ -12,9 +12,20 @@ namespace Slim\Tests;
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
+use Twig\Extension\ExtensionInterface;
+use Twig\Loader\FilesystemLoader;
 
 class TwigTest extends TestCase
 {
+    public function testAddExtension()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+
+        $mock = $this->createMock(ExtensionInterface::class);
+        $view->addExtension($mock);
+        $this->assertTrue($view->getEnvironment()->hasExtension(get_class($mock)));
+    }
+
     public function testFetch()
     {
         $view = new Twig(dirname(__FILE__) . '/templates');
@@ -185,5 +196,58 @@ class TwigTest extends TestCase
             'name' => 'Josh'
         ]);
         $this->assertInstanceOf(ResponseInterface::class, $response);
+    }
+
+    public function testGetLoader()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $view->getLoader();
+        $this->assertEquals(FilesystemLoader::class, get_class($loader));
+    }
+
+    public function testOffsetExists()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $view->offsetSet('foo', 'bar');
+        $this->assertTrue($view->offsetExists('foo'));
+        $this->assertFalse($view->offsetExists('moo'));
+    }
+
+    public function testArrayAccess()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $view->offsetSet('foo', 'bar');
+        $this->assertEquals('bar', $view['foo']);
+        $this->assertFalse(isset($view['moo']));
+    }
+
+    public function testOffsetGet()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $view->offsetSet('foo', 'bar');
+        $this->assertEquals('bar', $view->offsetGet('foo'));
+    }
+
+    public function testOffsetUnset()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $view->offsetSet('foo', 'bar');
+        $view->offsetUnset('foo');
+        $this->assertFalse($view->offsetExists('foo'));
+    }
+
+    public function testCount()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $view->offsetSet('foo', 'bar');
+        $this->assertEquals(1, $view->count());
+    }
+
+    public function testGetIterator()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+        $view->offsetSet('foo', 'bar');
+        $iterator = $view->getIterator();
+        $this->assertEquals(['foo' => 'bar'], $iterator->getArrayCopy());
     }
 }
