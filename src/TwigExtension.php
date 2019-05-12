@@ -46,7 +46,7 @@ class TwigExtension extends AbstractExtension
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'slim';
     }
@@ -54,7 +54,7 @@ class TwigExtension extends AbstractExtension
     /**
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('url_for', [$this, 'urlFor']),
@@ -72,7 +72,7 @@ class TwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function urlFor(string $routeName, array $data = [], $queryParams = [])
+    public function urlFor(string $routeName, array $data = [], array $queryParams = []): string
     {
         return $this->routeParser->urlFor($routeName, $data, $queryParams);
     }
@@ -84,7 +84,7 @@ class TwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function fullUrlFor(string $routeName, array $data = [], array $queryParams = [])
+    public function fullUrlFor(string $routeName, array $data = [], array $queryParams = []): string
     {
         return $this->routeParser->fullUrlFor($this->uri, $routeName, $data, $queryParams);
     }
@@ -95,7 +95,7 @@ class TwigExtension extends AbstractExtension
      *
      * @return bool
      */
-    public function isCurrentUrl(string $routeName, $data = []): bool
+    public function isCurrentUrl(string $routeName, array $data = []): bool
     {
         $currentUrl = $this->basePath . $this->uri->getPath();
         $result = $this->routeParser->urlFor($routeName, $data) ;
@@ -110,7 +110,7 @@ class TwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function getCurrentUrl($withQueryString = false)
+    public function getCurrentUrl(bool $withQueryString = false): string
     {
         $currentUrl = $this->basePath . $this->uri->getPath();
         $query = $this->uri->getQuery();
