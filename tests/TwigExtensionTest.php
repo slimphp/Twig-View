@@ -12,11 +12,74 @@ namespace Slim\Tests;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Slim\Interfaces\CallableResolverInterface;
+use Slim\Interfaces\RouteInterface;
 use Slim\Routing\RouteCollector;
 use Slim\Views\TwigExtension;
 
 class TwigExtensionTest extends TestCase
 {
+    /**
+     * Create a route collector using the given base path.
+     *
+     * Note that this method would create mocks for the ResponseFactoryInterface
+     * and the CallableResolverInterface injected into the constructor of the
+     * RouteCollector.
+     *
+     * @param string $basePath
+     *
+     * @return RouteCollector
+     */
+    protected function createRouteCollector(string $basePath): RouteCollector
+    {
+        $routeCollector = new RouteCollector(
+          $this->createMock(ResponseFactoryInterface::class),
+          $this->createMock(CallableResolverInterface::class)
+        );
+
+        if ($basePath) {
+            $routeCollector->setBasePath($basePath);
+        }
+
+        return $routeCollector;
+    }
+
+    /**
+     * Map a route to the given route collector.
+     *
+     * @param RouteCollector $routeCollector
+     * @param array          $methods
+     * @param string         $pattern
+     * @param string         $routeName
+     *
+     * @return RouteInterface
+     */
+    protected function mapRouteCollectorRoute(
+      RouteCollector $routeCollector,
+      array $methods,
+      string $pattern,
+      string $routeName
+    ): RouteInterface {
+        $route = $routeCollector->map($methods, $pattern, 'handler');
+        $route->setName($routeName);
+        return $route;
+    }
+
+    /**
+     * Create a TwigExtension given a base path and a uri.
+     *
+     * @param string       $basePath
+     * @param UriInterface $uri
+     *
+     * @return TwigExtension
+     */
+    protected function createTwigExtension(string $basePath, UriInterface $uri): TwigExtension
+    {
+        $routeCollector = $this->createRouteCollector($basePath);
+        $routeParser    = $routeCollector->getRouteParser();
+
+        return new TwigExtension($routeParser, $uri, $basePath);
+    }
+
     public function isCurrentUrlProvider()
     {
         return [
@@ -32,19 +95,11 @@ class TwigExtensionTest extends TestCase
      */
     public function testIsCurrentUrl(string $pattern, array $data, string $path, ?string $basePath, bool $expected)
     {
-        $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $callableResolverProphecy = $this->prophesize(CallableResolverInterface::class);
-
-        $routeCollector = new RouteCollector($responseFactoryProphecy->reveal(), $callableResolverProphecy->reveal());
+        $routeCollector = $this->createRouteCollector($basePath);
         $routeParser = $routeCollector->getRouteParser();
 
-        if ($basePath) {
-            $routeCollector->setBasePath($basePath);
-        }
-
         $routeName = 'route';
-        $route = $routeCollector->map(['GET'], $pattern, 'handler');
-        $route->setName($routeName);
+        $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
 
         $uriProphecy = $this->prophesize(UriInterface::class);
 
@@ -74,15 +129,11 @@ class TwigExtensionTest extends TestCase
      */
     public function testCurrentUrl(string $pattern, string $url, string $basePath, bool $withQueryString)
     {
-        $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $callableResolverProphecy = $this->prophesize(CallableResolverInterface::class);
-
-        $routeCollector = new RouteCollector($responseFactoryProphecy->reveal(), $callableResolverProphecy->reveal());
+        $routeCollector = $this->createRouteCollector($basePath);
         $routeParser = $routeCollector->getRouteParser();
 
         $routeName = 'route';
-        $route = $routeCollector->map(['GET'], $pattern, 'handler');
-        $route->setName($routeName);
+        $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
 
         $uriProphecy = $this->prophesize(UriInterface::class);
 
@@ -108,5 +159,116 @@ class TwigExtensionTest extends TestCase
         $result = $extension->getCurrentUrl($withQueryString);
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testGetName()
+    {
+        $uriProphecy = $this->prophesize(UriInterface::class);
+        /** @var UriInterface $uri */
+        $uri = $uriProphecy->reveal();
+
+        $extension = $this->createTwigExtension('', $uri);
+        $this->assertEquals('slim', $extension->getName());
+    }
+
+    public function testGetFunctions()
+    {
+        $expectedFunctionNames = ['url_for', 'full_url_for', 'is_current_url', 'current_url', 'get_uri'];
+
+        $uriProphecy = $this->prophesize(UriInterface::class);
+        /** @var UriInterface $uri */
+        $uri = $uriProphecy->reveal();
+
+        $extension = $this->createTwigExtension('', $uri);
+        $functions = $extension->getFunctions();
+        for ($i = count($functions) - 1; $i >= 0; $i--) {
+            $this->assertEquals($expectedFunctionNames[$i], $functions[$i]->getName());
+        }
+    }
+
+    public function urlForProvider()
+    {
+        return [
+          ['/hello/{name}', ['name' => 'world'], [], '', '/hello/world'],
+          ['/hello/{name}', ['name' => 'world'], [], '/base-path', '/base-path/hello/world'],
+          ['/hello/{name}', ['name' => 'world'], ['foo' => 'bar'], '', '/hello/world?foo=bar'],
+          ['/hello/{name}', ['name' => 'world'], ['foo' => 'bar'], '/base-path', '/base-path/hello/world?foo=bar'],
+        ];
+    }
+
+    /**
+     * @dataProvider urlForProvider
+     */
+    public function testUrlFor(string $pattern, array $routeData, array $queryParams, string $basePath, string $expectedUrl)
+    {
+        $routeName = 'route';
+
+        $routeCollector = $this->createRouteCollector($basePath);
+        $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
+
+        $uriProphecy = $this->prophesize(UriInterface::class);
+        /** @var UriInterface $uri */
+        $uri = $uriProphecy->reveal();
+
+        $extension = new TwigExtension($routeCollector->getRouteParser(), $uri, $routeCollector->getBasePath());
+        $this->assertEquals($expectedUrl, $extension->urlFor($routeName, $routeData, $queryParams));
+    }
+
+    public function fullUrlForProvider()
+    {
+        return [
+          ['/hello/{name}', ['name' => 'world'], [], '', 'http://localhost/hello/world'],
+          ['/hello/{name}', ['name' => 'world'], [], '/base-path', 'http://localhost/base-path/hello/world'],
+          ['/hello/{name}', ['name' => 'world'], ['foo' => 'bar'], '', 'http://localhost/hello/world?foo=bar'],
+          ['/hello/{name}', ['name' => 'world'], ['foo' => 'bar'], '/base-path', 'http://localhost/base-path/hello/world?foo=bar'],
+        ];
+    }
+
+    /**
+     * @dataProvider fullUrlForProvider
+     */
+    public function testFullUrlFor(string $pattern, array $routeData, array $queryParams, string $basePath, string $expectedFullUrl)
+    {
+        $routeName = 'route';
+
+        $routeCollector = $this->createRouteCollector($basePath);
+        $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
+
+        $uriProphecy = $this->prophesize(UriInterface::class);
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $uriProphecy->getScheme()
+          ->willReturn('http')
+          ->shouldBeCalledOnce();
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $uriProphecy->getAuthority()
+          ->willReturn('localhost')
+          ->shouldBeCalledOnce();
+
+        /** @var UriInterface $uri */
+        $uri = $uriProphecy->reveal();
+
+        $extension = new TwigExtension($routeCollector->getRouteParser(), $uri, $routeCollector->getBasePath());
+        $this->assertEquals($expectedFullUrl, $extension->fullUrlFor($routeName, $routeData, $queryParams));
+    }
+
+    public function testSetUri()
+    {
+        $uri       = $this->createMock(UriInterface::class);
+        $extension = $this->createTwigExtension('', $uri);
+
+        $uri2 = $this->createMock(UriInterface::class);
+        $extension->setUri($uri2);
+        $this->assertEquals($uri2, $extension->getUri());
+    }
+
+    public function testSetBasePath()
+    {
+        $extension = $this->createTwigExtension('', $this->createMock(UriInterface::class));
+
+        $basePath = '/base-path';
+        $extension->setBasePath($basePath);
+        $this->assertEquals($basePath, $extension->getBasePath());
     }
 }
