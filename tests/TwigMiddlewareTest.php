@@ -118,4 +118,59 @@ class TwigMiddlewareTest extends TestCase
 
         $this->assertSame($twigProphecy->reveal(), $container->get('view'));
     }
+
+    public function testSetContainerKey()
+    {
+        $self = $this;
+
+        $basePath    = '/base-path';
+        $uriProphecy = $this->prophesize(UriInterface::class);
+
+        $twigProphecy = $this->prophesize(Twig::class);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $twigProphecy
+          ->addExtension(Argument::type('object'))
+          ->will(function ($args) use ($self, $uriProphecy, $basePath) {
+              /** @var TwigExtension $extension */
+              $extension = $args[0];
+
+              $self->assertEquals($uriProphecy->reveal(), $extension->getUri());
+              $self->assertEquals($basePath, $extension->getBasePath());
+          })
+          ->shouldBeCalledOnce();
+
+        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
+        $container           = new MockContainerWithArrayAccess();
+
+        /** @noinspection PhpParamsInspection */
+        $twigMiddleware = new TwigMiddleware(
+          $twigProphecy->reveal(),
+          $container,
+          $routeParserProphecy->reveal(),
+          $basePath
+        );
+
+        $twigMiddleware->setContainerKey(Twig::class);
+
+        $responseProphecy = $this->prophesize(ResponseInterface::class);
+
+        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestProphecy
+          ->getUri()
+          ->willReturn($uriProphecy->reveal())
+          ->shouldBeCalledOnce();
+
+        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestHandlerProphecy
+          ->handle($requestProphecy->reveal())
+          ->shouldBeCalledOnce()
+          ->willReturn($responseProphecy->reveal());
+
+        /** @noinspection PhpParamsInspection */
+        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
+
+        $this->assertSame($twigProphecy->reveal(), $container->get(Twig::class));
+    }
 }
