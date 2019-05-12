@@ -35,6 +35,7 @@ class TwigExtensionTest extends TestCase
           $this->createMock(ResponseFactoryInterface::class),
           $this->createMock(CallableResolverInterface::class)
         );
+
         if ($basePath) {
             $routeCollector->setBasePath($basePath);
         }
