@@ -40,17 +40,39 @@ class TwigMiddleware implements MiddlewareInterface
     protected $basePath;
 
     /**
+     * @var string
+     */
+    protected $containerKey;
+
+    /**
      * @param Twig                 $twig
      * @param ContainerInterface   $container
      * @param RouteParserInterface $routeParser
      * @param string               $basePath
+     * @param string               $containerKey
      */
-    public function __construct(Twig $twig, ContainerInterface $container, RouteParserInterface $routeParser, string $basePath = '')
-    {
+    public function __construct(
+      Twig $twig,
+      ContainerInterface $container,
+      RouteParserInterface $routeParser,
+      string $basePath = '',
+      string $containerKey = 'view'
+    ) {
         $this->twig = $twig;
         $this->container = $container;
         $this->routeParser = $routeParser;
         $this->basePath = $basePath;
+        $this->containerKey = $containerKey;
+    }
+
+    /**
+     * Set the container key.
+     *
+     * @param string $containerKey
+     */
+    public function setContainerKey(string $containerKey): void
+    {
+        $this->containerKey = $containerKey;
     }
 
     /**
@@ -62,9 +84,9 @@ class TwigMiddleware implements MiddlewareInterface
         $this->twig->addExtension($extension);
 
         if (method_exists($this->container, 'set')) {
-            $this->container->set('view', $this->twig);
+            $this->container->set($this->containerKey, $this->twig);
         } elseif ($this->container instanceof ArrayAccess) {
-            $this->container['view'] = $this->twig;
+            $this->container[$this->containerKey] = $this->twig;
         }
 
         return $handler->handle($request);
