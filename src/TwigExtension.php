@@ -98,7 +98,7 @@ class TwigExtension extends AbstractExtension
     public function isCurrentUrl(string $routeName, array $data = []): bool
     {
         $currentUrl = $this->basePath . $this->uri->getPath();
-        $result = $this->routeParser->urlFor($routeName, $data) ;
+        $result = $this->routeParser->urlFor($routeName, $data);
 
         return $result === $currentUrl;
     }
