@@ -30,9 +30,9 @@ class TwigRuntimeExtension
     protected $uri;
 
     /**
-     * @param RouteParserInterface $routeParser
-     * @param UriInterface         $uri
-     * @param string               $basePath
+     * @param RouteParserInterface $routeParser Route parser
+     * @param UriInterface         $uri         Uri
+     * @param string               $basePath    Base path
      */
     public function __construct(RouteParserInterface $routeParser, UriInterface $uri, string $basePath = '')
     {
@@ -42,9 +42,11 @@ class TwigRuntimeExtension
     }
 
     /**
-     * @param string $routeName
-     * @param array  $data
-     * @param array  $queryParams
+     * Get the url for a named route
+     *
+     * @param string $routeName   Route name
+     * @param array  $data        Route placeholders
+     * @param array  $queryParams Query parameters
      *
      * @return string
      */
@@ -54,9 +56,11 @@ class TwigRuntimeExtension
     }
 
     /**
-     * @param string $routeName Route placeholders
-     * @param array  $data      Route placeholders
-     * @param array  $queryParams
+     * Get the full url for a named route
+     *
+     * @param string $routeName   Route name
+     * @param array  $data        Route placeholders
+     * @param array  $queryParams Query parameters
      *
      * @return string
      */
@@ -66,8 +70,8 @@ class TwigRuntimeExtension
     }
 
     /**
-     * @param string $routeName
-     * @param array  $data
+     * @param string $routeName Route name
+     * @param array  $data      Route placeholders
      *
      * @return bool
      */
@@ -80,7 +84,7 @@ class TwigRuntimeExtension
     }
 
     /**
-     * Returns current path on given URI.
+     * Get current path on given Uri
      *
      * @param bool $withQueryString
      *
@@ -99,6 +103,8 @@ class TwigRuntimeExtension
     }
 
     /**
+     * Get the uri
+     *
      * @return UriInterface
      */
     public function getUri(): UriInterface
@@ -107,6 +113,8 @@ class TwigRuntimeExtension
     }
 
     /**
+     * Set the uri
+     *
      * @param UriInterface $uri
      *
      * @return self
@@ -119,6 +127,8 @@ class TwigRuntimeExtension
     }
 
     /**
+     * Get the base path
+     *
      * @return string
      */
     public function getBasePath(): string
@@ -127,7 +137,7 @@ class TwigRuntimeExtension
     }
 
     /**
-     * Set the base url
+     * Set the base path
      *
      * @param string $basePath
      *
@@ -139,5 +149,4 @@ class TwigRuntimeExtension
 
         return $this;
     }
-
 }
