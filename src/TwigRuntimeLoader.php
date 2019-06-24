@@ -21,14 +21,14 @@ class TwigRuntimeLoader implements RuntimeLoaderInterface
     protected $routeParser;
 
     /**
-     * @var string
-     */
-    protected $basePath = '';
-
-    /**
      * @var UriInterface
      */
     protected $uri;
+
+    /**
+     * @var string
+     */
+    protected $basePath = '';
 
     /**
      * TwigRuntimeLoader constructor.
@@ -49,7 +49,6 @@ class TwigRuntimeLoader implements RuntimeLoaderInterface
      */
     public function load($class)
     {
-        file_put_contents('C:/Users/Adrian/Desktop/test.log', $class);
         if (TwigRuntimeExtension::class === $class) {
             return new $class($this->routeParser, $this->uri, $this->basePath);
         }
