@@ -80,8 +80,8 @@ class TwigMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $loader = new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
-        $this->twig->getEnvironment()->addRuntimeLoader($loader);
+        $runtimeLoader = new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
+        $this->twig->addRuntimeLoader($runtimeLoader);
 
         $extension = new TwigExtension();
         $this->twig->addExtension($extension);
