@@ -11,7 +11,6 @@ namespace Slim\Views;
 
 use Psr\Http\Message\UriInterface;
 use Slim\Interfaces\RouteParserInterface;
-use Twig\TwigFunction;
 
 class TwigRuntimeExtension
 {
