@@ -20,6 +20,7 @@ use Twig\Error\SyntaxError;
 use Twig\Extension\ExtensionInterface;
 use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 /**
  * Twig View
@@ -72,6 +73,16 @@ class Twig implements ArrayAccess
     public function addExtension(ExtensionInterface $extension): void
     {
         $this->environment->addExtension($extension);
+    }
+
+    /**
+     * Proxy method to add a runtime loader to the Twig environment
+     *
+     * @param RuntimeLoaderInterface $runtimeLoader
+     */
+    public function addRuntimeLoader(RuntimeLoaderInterface $runtimeLoader): void
+    {
+        $this->environment->addRuntimeLoader($runtimeLoader);
     }
 
     /**

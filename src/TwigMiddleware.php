@@ -52,11 +52,11 @@ class TwigMiddleware implements MiddlewareInterface
      * @param string               $containerKey
      */
     public function __construct(
-      Twig $twig,
-      ContainerInterface $container,
-      RouteParserInterface $routeParser,
-      string $basePath = '',
-      string $containerKey = 'view'
+        Twig $twig,
+        ContainerInterface $container,
+        RouteParserInterface $routeParser,
+        string $basePath = '',
+        string $containerKey = 'view'
     ) {
         $this->twig = $twig;
         $this->container = $container;
@@ -80,7 +80,10 @@ class TwigMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $extension = new TwigExtension($this->routeParser, $request->getUri(), $this->basePath);
+        $runtimeLoader = new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
+        $this->twig->addRuntimeLoader($runtimeLoader);
+
+        $extension = new TwigExtension();
         $this->twig->addExtension($extension);
 
         if (method_exists($this->container, 'set')) {

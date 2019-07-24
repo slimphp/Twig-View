@@ -13,7 +13,9 @@ use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
 use Twig\Extension\ExtensionInterface;
+use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\FilesystemLoader;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TwigTest extends TestCase
 {
@@ -24,6 +26,29 @@ class TwigTest extends TestCase
         $mock = $this->createMock(ExtensionInterface::class);
         $view->addExtension($mock);
         $this->assertTrue($view->getEnvironment()->hasExtension(get_class($mock)));
+    }
+
+    public function testAddRuntimeLoader()
+    {
+        $view = new Twig(dirname(__FILE__) . '/templates');
+
+        // Mock a runtime extension.
+        $runtimeExtension = $this->createMock(RuntimeExtensionInterface::class);
+
+        // Mock a runtime loader.
+        $runtimeLoader = $this->getMockBuilder(RuntimeLoaderInterface::class)
+            ->setMethods(['load'])
+            ->getMock();
+
+        // The method `load` should be called once and should return the mocked runtime extension.
+        $runtimeLoader->expects($this->once())
+            ->method('load')
+            ->willReturn($runtimeExtension);
+
+        /** @noinspection PhpParamsInspection */
+        $view->addRuntimeLoader($runtimeLoader);
+
+        $this->assertSame($runtimeExtension, $view->getEnvironment()->getRuntime(get_class($runtimeLoader)));
     }
 
     public function testFetch()
