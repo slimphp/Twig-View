@@ -15,6 +15,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use RuntimeException;
+use Slim\App;
 use Slim\Interfaces\RouteParserInterface;
 
 class TwigMiddleware implements MiddlewareInterface
@@ -43,6 +45,32 @@ class TwigMiddleware implements MiddlewareInterface
      * @var string
      */
     protected $containerKey;
+
+    /**
+     * @param App    $app
+     * @param string $containerKey
+     *
+     * @return TwigMiddleware
+     */
+    public static function create(App $app, string $containerKey = 'view'): self
+    {
+        if ($app->getContainer() === null) {
+            throw new RuntimeException('The app does not have a container.');
+        }
+
+        $twig = $app->getContainer()->get($containerKey);
+        if (!($twig instanceof Twig)) {
+            throw new RuntimeException(sprintf('Twig could not be found in the container (key=%s).', $containerKey));
+        }
+
+        return new self(
+            $twig,
+            $app->getContainer(),
+            $app->getRouteCollector()->getRouteParser(),
+            $app->getBasePath(),
+            $containerKey
+        );
+    }
 
     /**
      * @param Twig                 $twig
