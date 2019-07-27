@@ -12,10 +12,14 @@ namespace Slim\Tests;
 use DI\Container;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ReflectionProperty;
+use RuntimeException;
+use Slim\App;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Tests\Mocks\MockContainerWithArrayAccess;
 use Slim\Views\Twig;
@@ -68,6 +72,48 @@ class TwigMiddlewareTest extends TestCase
             ->shouldBeCalledOnce();
 
         return $twigProphecy;
+    }
+
+    public function testCreate()
+    {
+        $twig = $this->createMock(Twig::class);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('get')->with('view')->willReturn($twig);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        $middleware = TwigMiddleware::create($app, 'view');
+
+        $twigProperty = new ReflectionProperty(TwigMiddleware::class, 'twig');
+        $twigProperty->setAccessible(true);
+
+        $this->assertSame($twig, $twigProperty->getValue($middleware));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The app does not have a container.
+     */
+    public function testCreateWithoutContainer()
+    {
+        $app = $this->createMock(App::class);
+        TwigMiddleware::create($app, 'view');
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Twig could not be found in the container (key=view).
+     */
+    public function testCreateWithoutTwig()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        TwigMiddleware::create($app, 'view');
     }
 
     public function testProcessAppendsTwigExtensionToContainerWithSetMethod()
