@@ -80,6 +80,7 @@ class TwigMiddlewareTest extends TestCase
         $twig = $this->createMock(Twig::class);
         $routeParser = $this->createMock(RouteParserInterface::class);
         $basePath = '/base-path';
+        $attribute = 'view';
 
         $routeCollector = $this->createMock(RouteCollectorInterface::class);
         $routeCollector->method('getRouteParser')->willReturn($routeParser);
@@ -88,7 +89,7 @@ class TwigMiddlewareTest extends TestCase
         $app->method('getRouteCollector')->willReturn($routeCollector);
         $app->method('getBasePath')->willReturn($basePath);
 
-        $middleware = TwigMiddleware::create($app, $twig);
+        $middleware = TwigMiddleware::create($app, $twig, $attribute);
 
         $twigProperty = new ReflectionProperty(TwigMiddleware::class, 'twig');
         $twigProperty->setAccessible(true);
@@ -101,9 +102,13 @@ class TwigMiddlewareTest extends TestCase
         $basePathProperty = new ReflectionProperty(TwigMiddleware::class, 'basePath');
         $basePathProperty->setAccessible(true);
         $this->assertSame($basePath, $basePathProperty->getValue($middleware));
+
+        $attributeProperty = new ReflectionProperty(TwigMiddleware::class, 'attribute');
+        $attributeProperty->setAccessible(true);
+        $this->assertSame($attribute, $attributeProperty->getValue($middleware));
     }
 
-    public function testProcess()
+    public function testProcessWithoutAttribute()
     {
         $basePath = '/base-path';
         $uriProphecy = $this->prophesize(UriInterface::class);
@@ -130,6 +135,47 @@ class TwigMiddlewareTest extends TestCase
         /** @noinspection PhpUndefinedMethodInspection */
         $requestHandlerProphecy
             ->handle($requestProphecy->reveal())
+            ->shouldBeCalledOnce()
+            ->willReturn($responseProphecy->reveal());
+
+        /** @noinspection PhpParamsInspection */
+        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
+    }
+
+    public function testProcessWithAttribute()
+    {
+        $basePath = '/base-path';
+        $attribute = 'view';
+        $uriProphecy = $this->prophesize(UriInterface::class);
+        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
+        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
+
+        /** @noinspection PhpParamsInspection */
+        $twigMiddleware = new TwigMiddleware(
+            $twigProphecy->reveal(),
+            $routeParserProphecy->reveal(),
+            $basePath,
+            $attribute
+        );
+
+        $responseProphecy = $this->prophesize(ResponseInterface::class);
+        $attrRequestProphecy = $this->prophesize(ServerRequestInterface::class);
+
+        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestProphecy
+            ->getUri()
+            ->willReturn($uriProphecy->reveal())
+            ->shouldBeCalledOnce();
+        $requestProphecy
+            ->withAttribute($attribute, $twigProphecy->reveal())
+            ->willReturn($attrRequestProphecy->reveal())
+            ->shouldBeCalledOnce();
+
+        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestHandlerProphecy
+            ->handle($attrRequestProphecy->reveal())
             ->shouldBeCalledOnce()
             ->willReturn($responseProphecy->reveal());
 
