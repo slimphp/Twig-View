@@ -106,7 +106,7 @@ class TwigMiddlewareTest extends TestCase
 
     public function testProcessWithoutAttribute()
     {
-        $basePath = '/base-path';
+        $basePath = '';
         $uriProphecy = $this->prophesize(UriInterface::class);
         $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
         $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
@@ -114,8 +114,7 @@ class TwigMiddlewareTest extends TestCase
         /** @noinspection PhpParamsInspection */
         $twigMiddleware = new TwigMiddleware(
             $twigProphecy->reveal(),
-            $routeParserProphecy->reveal(),
-            $basePath
+            $routeParserProphecy->reveal()
         );
 
         $responseProphecy = $this->prophesize(ResponseInterface::class);
