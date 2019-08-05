@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
-use DI\Container;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -22,7 +20,6 @@ use RuntimeException;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Interfaces\RouteParserInterface;
-use Slim\Tests\Mocks\MockContainerWithArrayAccess;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
