@@ -18,13 +18,8 @@ use RuntimeException;
 use Slim\App;
 use Slim\Interfaces\RouteParserInterface;
 
-class LazyTwigMiddleware implements MiddlewareInterface
+class LazyTwigMiddleware extends TwigMiddleware
 {
-    /**
-     * @var RouteParserInterface
-     */
-    protected $routeParser;
-
     /**
      * @var ContainerInterface
      */
@@ -36,17 +31,9 @@ class LazyTwigMiddleware implements MiddlewareInterface
     protected $containerKey;
 
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    protected $basePath;
-
-    /**
-     * @param App    $app
-     * @param string $containerKey
-     *
-     * @return TwigMiddleware
-     */
-    public static function create(App $app, string $containerKey = 'view'): self
+    public static function create(App $app, string $containerKey = 'view'): parent
     {
         $container = $app->getContainer();
         if ($container === null) {
@@ -84,14 +71,7 @@ class LazyTwigMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $twig = $this->container->get($this->containerKey);
-
-        $runtimeLoader = new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
-        $twig->addRuntimeLoader($runtimeLoader);
-
-        $extension = new TwigExtension();
-        $twig->addExtension($extension);
-
-        return $handler->handle($request);
+        $this->twig = $this->container->get($this->containerKey);
+        return parent::process($request, $handler);
     }
 }
