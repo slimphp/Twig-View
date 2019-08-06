@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -21,20 +22,38 @@ use Slim\Views\TwigMiddleware;
 
 class TwigMiddlewareTest extends TestCase
 {
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The app does not have a container.
+     */
+    public function testCreateWithoutContainer()
+    {
+        $app = $this->createMock(App::class);
+        TwigMiddleware::create($app);
+    }
+
     public function testCreate()
     {
-        $twig = $this->createMock(Twig::class);
-        $routeParser = $this->createMock(RouteParserInterface::class);
+        $key = 'twig';
         $basePath = '/base-path';
 
+        $twig = $this->createMock(Twig::class);
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('get')
+            ->with($this->equalTo($key))
+            ->willReturn($twig);
+
+        $routeParser = $this->createMock(RouteParserInterface::class);
         $routeCollector = $this->createMock(RouteCollectorInterface::class);
         $routeCollector->method('getRouteParser')->willReturn($routeParser);
 
         $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
         $app->method('getRouteCollector')->willReturn($routeCollector);
         $app->method('getBasePath')->willReturn($basePath);
 
-        $middleware = TwigMiddleware::create($app, $twig);
+        $middleware = TwigMiddleware::create($app, $key);
 
         $this->assertInaccessiblePropertySame($twig, $middleware, 'twig');
         $this->assertInaccessiblePropertySame($routeParser, $middleware, 'routeParser');

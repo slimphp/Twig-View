@@ -46,7 +46,7 @@ class LazyTwigMiddleware implements MiddlewareInterface
      *
      * @return TwigMiddleware
      */
-    public static function create(App $app, string $containerKey = Twig::class): self
+    public static function create(App $app, string $containerKey = 'view'): self
     {
         $container = $app->getContainer();
         if ($container === null) {
@@ -70,7 +70,7 @@ class LazyTwigMiddleware implements MiddlewareInterface
     public function __construct(
         RouteParserInterface $routeParser,
         ContainerInterface $container,
-        string $containerKey = Twig::class,
+        string $containerKey = 'view',
         string $basePath = ''
     ) {
         $this->routeParser = $routeParser;
