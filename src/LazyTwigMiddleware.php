@@ -41,18 +41,12 @@ class LazyTwigMiddleware implements MiddlewareInterface
     protected $basePath;
 
     /**
-     * @var string
-     */
-    protected $attribute;
-
-    /**
      * @param App    $app
      * @param string $containerKey
-     * @param string $attribute
      *
      * @return TwigMiddleware
      */
-    public static function create(App $app, string $containerKey = Twig::class, string $attribute = ''): self
+    public static function create(App $app, string $containerKey = Twig::class): self
     {
         $container = $app->getContainer();
         if ($container === null) {
@@ -63,8 +57,7 @@ class LazyTwigMiddleware implements MiddlewareInterface
             $app->getRouteCollector()->getRouteParser(),
             $container,
             $containerKey,
-            $app->getBasePath(),
-            $attribute
+            $app->getBasePath()
         );
     }
 
@@ -73,20 +66,17 @@ class LazyTwigMiddleware implements MiddlewareInterface
      * @param ContainerInterface   $container
      * @param string               $containerKey
      * @param string               $basePath
-     * @param string               $attribute
      */
     public function __construct(
         RouteParserInterface $routeParser,
         ContainerInterface $container,
         string $containerKey = Twig::class,
-        string $basePath = '',
-        string $attribute = ''
+        string $basePath = ''
     ) {
         $this->routeParser = $routeParser;
         $this->container = $container;
         $this->containerKey = $containerKey;
         $this->basePath = $basePath;
-        $this->attribute = $attribute;
     }
 
     /**
@@ -101,10 +91,6 @@ class LazyTwigMiddleware implements MiddlewareInterface
 
         $extension = new TwigExtension();
         $twig->addExtension($extension);
-
-        if ($this->attribute) {
-            $request = $request->withAttribute($this->attribute, $twig);
-        }
 
         return $handler->handle($request);
     }

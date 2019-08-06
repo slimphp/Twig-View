@@ -86,7 +86,6 @@ class LazyTwigMiddlewareTest extends TestCase
     public function testCreate()
     {
         $containerKey = 'twig';
-        $attribute = 'view';
 
         $container = $this->createMock(ContainerInterface::class);
         $routeParser = $this->createMock(RouteParserInterface::class);
@@ -100,7 +99,7 @@ class LazyTwigMiddlewareTest extends TestCase
         $app->method('getRouteCollector')->willReturn($routeCollector);
         $app->method('getBasePath')->willReturn($basePath);
 
-        $middleware = LazyTwigMiddleware::create($app, $containerKey, $attribute);
+        $middleware = LazyTwigMiddleware::create($app, $containerKey);
 
         $containerProperty = new ReflectionProperty(LazyTwigMiddleware::class, 'container');
         $containerProperty->setAccessible(true);
@@ -117,58 +116,12 @@ class LazyTwigMiddlewareTest extends TestCase
         $basePathProperty = new ReflectionProperty(LazyTwigMiddleware::class, 'basePath');
         $basePathProperty->setAccessible(true);
         $this->assertSame($basePath, $basePathProperty->getValue($middleware));
-
-        $attributeProperty = new ReflectionProperty(LazyTwigMiddleware::class, 'attribute');
-        $attributeProperty->setAccessible(true);
-        $this->assertSame($attribute, $attributeProperty->getValue($middleware));
     }
 
-    public function testProcessWithoutAttribute()
+    public function testProcess()
     {
-        $basePath = '';
-        $uriProphecy = $this->prophesize(UriInterface::class);
-        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
-
-        $container = $this->prophesize(ContainerInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $container
-            ->get(Twig::class)
-            ->willReturn($twigProphecy->reveal())
-            ->shouldBeCalledOnce();
-
-        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware = new LazyTwigMiddleware(
-            $routeParserProphecy->reveal(),
-            $container->reveal()
-        );
-
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-
-        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestProphecy
-            ->getUri()
-            ->willReturn($uriProphecy->reveal())
-            ->shouldBeCalledOnce();
-
-        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestHandlerProphecy
-            ->handle($requestProphecy->reveal())
-            ->shouldBeCalledOnce()
-            ->willReturn($responseProphecy->reveal());
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
-    }
-
-    public function testProcessWithAttribute()
-    {
-        $key = 'twig';
+	$key = Twig::class;
         $basePath = '/base-path';
-        $attribute = 'view';
         $uriProphecy = $this->prophesize(UriInterface::class);
         $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
 
@@ -184,13 +137,12 @@ class LazyTwigMiddlewareTest extends TestCase
         /** @noinspection PhpParamsInspection */
         $twigMiddleware = new LazyTwigMiddleware(
             $routeParserProphecy->reveal(),
-            $container->reveal(),
-            $key,
-            $basePath,
-            $attribute
+	    $container->reveal(),
+	    $key,
+	    $basePath
         );
+
         $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $attrRequestProphecy = $this->prophesize(ServerRequestInterface::class);
 
         $requestProphecy = $this->prophesize(ServerRequestInterface::class);
         /** @noinspection PhpUndefinedMethodInspection */
@@ -198,15 +150,11 @@ class LazyTwigMiddlewareTest extends TestCase
             ->getUri()
             ->willReturn($uriProphecy->reveal())
             ->shouldBeCalledOnce();
-        $requestProphecy
-            ->withAttribute($attribute, $twigProphecy->reveal())
-            ->willReturn($attrRequestProphecy->reveal())
-            ->shouldBeCalledOnce();
 
         $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
         /** @noinspection PhpUndefinedMethodInspection */
         $requestHandlerProphecy
-            ->handle($attrRequestProphecy->reveal())
+            ->handle($requestProphecy->reveal())
             ->shouldBeCalledOnce()
             ->willReturn($responseProphecy->reveal());
 

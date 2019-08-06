@@ -34,24 +34,17 @@ class TwigMiddleware implements MiddlewareInterface
     protected $basePath;
 
     /**
-     * @var string
-     */
-    protected $attribute;
-
-    /**
      * @param App    $app
      * @param Twig   $twig
-     * @param string $attribute
      *
      * @return TwigMiddleware
      */
-    public static function create(App $app, Twig $twig, string $attribute = ''): self
+    public static function create(App $app, Twig $twig): self
     {
         return new self(
             $twig,
             $app->getRouteCollector()->getRouteParser(),
-            $app->getBasePath(),
-            $attribute
+            $app->getBasePath()
         );
     }
 
@@ -59,18 +52,15 @@ class TwigMiddleware implements MiddlewareInterface
      * @param Twig                 $twig
      * @param RouteParserInterface $routeParser
      * @param string               $basePath
-     * @param string               $attribute
      */
     public function __construct(
         Twig $twig,
         RouteParserInterface $routeParser,
-        string $basePath = '',
-        string $attribute = ''
+        string $basePath = ''
     ) {
         $this->twig = $twig;
         $this->routeParser = $routeParser;
         $this->basePath = $basePath;
-        $this->attribute = $attribute;
     }
 
     /**
@@ -83,10 +73,6 @@ class TwigMiddleware implements MiddlewareInterface
 
         $extension = new TwigExtension();
         $this->twig->addExtension($extension);
-
-        if ($this->attribute) {
-            $request = $request->withAttribute($this->attribute, $this->twig);
-        }
 
         return $handler->handle($request);
     }
