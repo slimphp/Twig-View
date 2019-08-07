@@ -56,6 +56,8 @@ class LazyTwigMiddleware extends TwigMiddleware
         string $containerKey = 'view',
         string $basePath = ''
     ) {
+        self::checkContainer($container, $containerKey);
+
         $this->routeParser = $routeParser;
         $this->container = $container;
         $this->containerKey = $containerKey;

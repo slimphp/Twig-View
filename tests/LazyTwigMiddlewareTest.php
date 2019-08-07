@@ -78,6 +78,22 @@ class LazyTwigMiddlewareTest extends TestCase
         $this->assertInaccessiblePropertySame($basePath, $middleware, 'basePath');
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage 'view' is not set on the container.
+     */
+    public function testConstructorWithoutContainerKey()
+    {
+        $routeParser = $this->createMock(RouteParserInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(false);
+
+        new LazyTwigMiddleware($routeParser, $container);
+    }
+
     public function testProcess()
     {
         $key = Twig::class;
@@ -87,6 +103,10 @@ class LazyTwigMiddlewareTest extends TestCase
 
         $container = $this->prophesize(ContainerInterface::class);
         /** @noinspection PhpUndefinedMethodInspection */
+        $container
+            ->has($key)
+            ->willReturn(true)
+            ->shouldBeCalledOnce();
         $container
             ->get($key)
             ->willReturn($twigProphecy->reveal())
