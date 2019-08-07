@@ -80,7 +80,7 @@ class LazyTwigMiddlewareTest extends TestCase
 
     public function testProcess()
     {
-	$key = Twig::class;
+        $key = Twig::class;
         $basePath = '/base-path';
         $uriProphecy = $this->prophesize(UriInterface::class);
         $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
@@ -95,12 +95,12 @@ class LazyTwigMiddlewareTest extends TestCase
         $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
 
         /** @noinspection PhpParamsInspection */
-        $twigMiddleware = new LazyTwigMiddleware(
-            $routeParserProphecy->reveal(),
-	    $container->reveal(),
-	    $key,
-	    $basePath
-        );
+            $twigMiddleware = new LazyTwigMiddleware(
+                $routeParserProphecy->reveal(),
+                $container->reveal(),
+                $key,
+                $basePath
+            );
 
         $responseProphecy = $this->prophesize(ResponseInterface::class);
 
