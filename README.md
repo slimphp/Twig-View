@@ -39,6 +39,14 @@ $app = new AppFactory::create();
 // Add Twig-View Middleware
 $app->add(TwigMiddleware::create($app));
 
+/*
+ * You can substitute TwigMiddleware with LazyTwigMiddleware
+ *     $app->add(LazyTwigMiddleware::create($app));
+ * The differences LazyTwigMiddleware only instantiate Twig object when
+ * the middleware run, can save few memory if the Request abort before
+ * reaching our middleware.
+ */
+
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {
     return $this->view->render($response, 'profile.html', [
