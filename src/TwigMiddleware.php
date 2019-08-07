@@ -36,10 +36,10 @@ class TwigMiddleware implements MiddlewareInterface
     protected $basePath;
 
     /**
-     * @param App    $app
-     * @param string $containerKey
+     * @param ContainerInterface|null $container
+     * @param string                  $containerKey
      */
-    protected function checkContainer(?ContainerInterface $container, string $containerKey)
+    protected function checkContainer(?ContainerInterface $container, string $containerKey): void
     {
         if ($container === null) {
             throw new RuntimeException('The app does not have a container.');
