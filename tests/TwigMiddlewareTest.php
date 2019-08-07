@@ -32,13 +32,33 @@ class TwigMiddlewareTest extends TestCase
         TwigMiddleware::create($app);
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage 'view' is not set on the container.
+     */
+    public function testCreateWithoutContainerKey()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(false);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        TwigMiddleware::create($app);
+    }
+
     public function testCreate()
     {
         $key = 'twig';
-        $basePath = '/base-path';
-
         $twig = $this->createMock(Twig::class);
         $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo($key))
+            ->willReturn(true);
         $container
             ->method('get')
             ->with($this->equalTo($key))
@@ -48,6 +68,7 @@ class TwigMiddlewareTest extends TestCase
         $routeCollector = $this->createMock(RouteCollectorInterface::class);
         $routeCollector->method('getRouteParser')->willReturn($routeParser);
 
+        $basePath = '/base-path';
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
         $app->method('getRouteCollector')->willReturn($routeCollector);
