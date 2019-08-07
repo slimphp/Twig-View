@@ -36,20 +36,6 @@ class TwigMiddleware implements MiddlewareInterface
     protected $basePath;
 
     /**
-     * @param ContainerInterface|null $container
-     * @param string                  $containerKey
-     */
-    protected static function checkContainer(?ContainerInterface $container, string $containerKey): void
-    {
-        if ($container === null) {
-            throw new RuntimeException('The app does not have a container.');
-        }
-        if (!$container->has($containerKey)) {
-            throw new RuntimeException("'$containerKey' is not set on the container.");
-        }
-    }
-
-    /**
      * @param App    $app
      * @param string $containerKey
      *
@@ -58,7 +44,12 @@ class TwigMiddleware implements MiddlewareInterface
     public static function create(App $app, string $containerKey = 'view'): self
     {
         $container = $app->getContainer();
-        self::checkContainer($container, $containerKey);
+        if ($container === null) {
+            throw new RuntimeException('The app does not have a container.');
+        }
+        if (!$container->has($containerKey)) {
+            throw new RuntimeException("'$containerKey' is not set on the container.");
+        }
 
         return new self(
             $container->get($containerKey),

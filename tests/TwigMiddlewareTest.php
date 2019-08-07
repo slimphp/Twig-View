@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,36 +21,55 @@ use Slim\App;
 use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
+use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
+use Slim\Views\TwigRuntimeExtension;
+use Slim\Views\TwigRuntimeLoader;
 
 class TwigMiddlewareTest extends TestCase
 {
     /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The app does not have a container.
+     * Create a twig prophecy given a uri prophecy and a base path.
+     *
+     * @param ObjectProphecy $uriProphecy
+     * @param string         $basePath
+     *
+     * @return ObjectProphecy
      */
-    public function testCreateWithoutContainer()
+    private function createTwigProphecy(ObjectProphecy $uriProphecy, string $basePath): ObjectProphecy
     {
-        $app = $this->createMock(App::class);
-        TwigMiddleware::create($app);
-    }
+        $self = $this;
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage 'view' is not set on the container.
-     */
-    public function testCreateWithoutContainerKey()
-    {
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->method('has')
-            ->with($this->equalTo('view'))
-            ->willReturn(false);
+        $twigProphecy = $this->prophesize(Twig::class);
 
-        $app = $this->createMock(App::class);
-        $app->method('getContainer')->willReturn($container);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $twigProphecy
+            ->addExtension(Argument::type('object'))
+            ->will(function ($args) use ($self) {
+                /** @var TwigExtension $extension */
+                $extension = $args[0];
 
-        TwigMiddleware::create($app);
+                $self->assertEquals('slim', $extension->getName());
+            })
+            ->shouldBeCalledOnce();
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $twigProphecy->
+        addRuntimeLoader(Argument::type('object'))
+            ->will(function ($args) use ($self, $uriProphecy, $basePath) {
+                /** @var TwigRuntimeLoader $runtimeLoader */
+                $runtimeLoader = $args[0];
+                $runtimeExtension = $runtimeLoader->load(TwigRuntimeExtension::class);
+
+                $self->assertInstanceOf(TwigRuntimeExtension::class, $runtimeExtension);
+
+                /** @var TwigRuntimeExtension $runtimeExtension */
+                $self->assertSame($uriProphecy->reveal(), $runtimeExtension->getUri());
+                $self->assertSame($basePath, $runtimeExtension->getBasePath());
+            })
+            ->shouldBeCalledOnce();
+
+        return $twigProphecy;
     }
 
     public function testCreate()
@@ -80,6 +101,34 @@ class TwigMiddlewareTest extends TestCase
         $this->assertInaccessiblePropertySame($twig, $middleware, 'twig');
         $this->assertInaccessiblePropertySame($routeParser, $middleware, 'routeParser');
         $this->assertInaccessiblePropertySame($basePath, $middleware, 'basePath');
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The app does not have a container.
+     */
+    public function testCreateWithoutContainer()
+    {
+        $app = $this->createMock(App::class);
+        TwigMiddleware::create($app);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage 'view' is not set on the container.
+     */
+    public function testCreateWithoutContainerKey()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(false);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        TwigMiddleware::create($app);
     }
 
     public function testProcess()
