@@ -14,6 +14,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionProperty;
 use Slim\Views\Twig;
+use Slim\Views\TwigExtension;
 use Slim\Views\TwigRuntimeExtension;
 use Slim\Views\TwigRuntimeLoader;
 
