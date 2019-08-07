@@ -18,8 +18,8 @@ use RuntimeException;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Interfaces\RouteParserInterface;
-use Slim\Views\Twig;
 use Slim\Views\LazyTwigMiddleware;
+use Slim\Views\Twig;
 
 class LazyTwigMiddlewareTest extends TestCase
 {

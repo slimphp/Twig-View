@@ -14,8 +14,6 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionProperty;
 use Slim\Views\Twig;
-use Slim\Views\TwigExtension;
-use Slim\Views\TwigMiddleware;
 use Slim\Views\TwigRuntimeExtension;
 use Slim\Views\TwigRuntimeLoader;
 
@@ -65,10 +63,10 @@ abstract class TestCase extends PhpUnitTestCase
         return $twigProphecy;
     }
 
-    protected function assertInaccessiblePropertySame($expected, object $o, string $name)
+    protected function assertInaccessiblePropertySame($expected, $obj, string $name)
     {
-        $prop = new ReflectionProperty(get_class($o), $name);
+        $prop = new ReflectionProperty(get_class($obj), $name);
         $prop->setAccessible(true);
-        $this->assertSame($expected, $prop->getValue($o));
+        $this->assertSame($expected, $prop->getValue($obj));
     }
 }
