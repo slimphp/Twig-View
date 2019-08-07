@@ -48,11 +48,20 @@ class TwigMiddleware implements MiddlewareInterface
             throw new RuntimeException('The app does not have a container.');
         }
         if (!$container->has($containerKey)) {
-            throw new RuntimeException("'$containerKey' is not set on the container.");
+            throw new RuntimeException(
+                "The container does not have key=$containerKey."
+            );
+        }
+
+        $twig = $container->get($containerKey);
+        if (!($twig instanceof Twig)) {
+            throw new RuntimeException(
+                "Twig could not be found in the container (key=$containerKey)."
+            );
         }
 
         return new self(
-            $container->get($containerKey),
+            $twig,
             $app->getRouteCollector()->getRouteParser(),
             $app->getBasePath()
         );

@@ -115,7 +115,7 @@ class TwigMiddlewareTest extends TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage 'view' is not set on the container.
+     * @expectedExceptionMessage The container does not have key=view.
      */
     public function testCreateWithoutContainerKey()
     {
@@ -124,6 +124,28 @@ class TwigMiddlewareTest extends TestCase
             ->method('has')
             ->with($this->equalTo('view'))
             ->willReturn(false);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        TwigMiddleware::create($app);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Twig could not be found in the container (key=view).
+     */
+    public function testCreateWithoutTwig()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(true);
+        $container
+            ->method('get')
+            ->with($this->equalTo('view'))
+            ->willReturn(null);
 
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
