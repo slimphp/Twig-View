@@ -91,8 +91,8 @@ class TwigMiddlewareTest extends TestCase
         /** @noinspection PhpParamsInspection */
         $twigMiddleware = new TwigMiddleware(
             $twigProphecy->reveal(),
-	    $routeParserProphecy->reveal(),
-	    $basePath
+            $routeParserProphecy->reveal(),
+            $basePath
         );
 
         $responseProphecy = $this->prophesize(ResponseInterface::class);
