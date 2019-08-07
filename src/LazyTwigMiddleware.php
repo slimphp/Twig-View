@@ -36,12 +36,7 @@ class LazyTwigMiddleware extends TwigMiddleware
     public static function create(App $app, string $containerKey = 'view'): parent
     {
         $container = $app->getContainer();
-        if ($container === null) {
-            throw new RuntimeException('The app does not have a container.');
-        }
-        if (!$container->has($containerKey)) {
-            throw new RuntimeException("'$containerKey' is not set on the container.");
-        }
+        self::checkContainer($container, $containerKey);
 
         return new self(
             $app->getRouteCollector()->getRouteParser(),

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Slim\Views;
 
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -37,18 +38,27 @@ class TwigMiddleware implements MiddlewareInterface
     /**
      * @param App    $app
      * @param string $containerKey
-     *
-     * @return TwigMiddleware
      */
-    public static function create(App $app, string $containerKey = 'view'): self
+    protected function checkContainer(?ContainerInterface $container, string $containerKey)
     {
-        $container = $app->getContainer();
         if ($container === null) {
             throw new RuntimeException('The app does not have a container.');
         }
         if (!$container->has($containerKey)) {
             throw new RuntimeException("'$containerKey' is not set on the container.");
         }
+    }
+
+    /**
+     * @param App    $app
+     * @param string $containerKey
+     *
+     * @return TwigMiddleware
+     */
+    public static function create(App $app, string $containerKey = 'view'): self
+    {
+        $container = $app->getContainer();
+        self::checkContainer($container, $containerKey);
 
         return new self(
             $container->get($containerKey),
