@@ -39,6 +39,9 @@ class LazyTwigMiddleware extends TwigMiddleware
         if ($container === null) {
             throw new RuntimeException('The app does not have a container.');
         }
+        if (!$container->has($containerKey)) {
+            throw new RuntimeException("'$containerKey' is not set on the container.");
+        }
 
         return new self(
             $app->getRouteCollector()->getRouteParser(),

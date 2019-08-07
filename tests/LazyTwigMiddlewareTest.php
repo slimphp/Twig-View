@@ -33,17 +33,38 @@ class LazyTwigMiddlewareTest extends TestCase
         LazyTwigMiddleware::create($app);
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage 'view' is not set on the container.
+     */
+    public function testCreateWithoutContainerKey()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(false);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        LazyTwigMiddleware::create($app);
+    }
+
     public function testCreate()
     {
         $containerKey = 'twig';
-
         $container = $this->createMock(ContainerInterface::class);
-        $routeParser = $this->createMock(RouteParserInterface::class);
-        $basePath = '/base-path';
+        $container
+            ->method('has')
+            ->with($this->equalTo($containerKey))
+            ->willReturn(true);
 
+        $routeParser = $this->createMock(RouteParserInterface::class);
         $routeCollector = $this->createMock(RouteCollectorInterface::class);
         $routeCollector->method('getRouteParser')->willReturn($routeParser);
 
+        $basePath = '/base-path';
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
         $app->method('getRouteCollector')->willReturn($routeCollector);
