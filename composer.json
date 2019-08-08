@@ -30,6 +30,11 @@
     },
     "autoload": {
         "psr-4": {
+            "Slim\\Views\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Slim\\Tests\\": "tests"
         }
     }
