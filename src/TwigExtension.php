@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Slim\Views;
 
-use Psr\Http\Message\UriInterface;
-use Slim\Interfaces\RouteParserInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
