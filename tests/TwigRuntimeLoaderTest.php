@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Slim\Tests;
 
 use Psr\Http\Message\UriInterface;
-use ReflectionProperty;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\TwigRuntimeExtension;
 use Slim\Views\TwigRuntimeLoader;
@@ -26,21 +25,9 @@ class TwigRuntimeLoaderTest extends TestCase
         // Create the twig runtime loader.
         $twigRuntimeLoader = new TwigRuntimeLoader($routeParser, $uri, $basePath);
 
-        // Make `TwigRuntimeLoader->routeParser` accessible.
-        $routeParserProperty = new ReflectionProperty(TwigRuntimeLoader::class, 'routeParser');
-        $routeParserProperty->setAccessible(true);
-
-        // Make `TwigRuntimeLoader->uri` accessible.
-        $uriProperty = new ReflectionProperty(TwigRuntimeLoader::class, 'uri');
-        $uriProperty->setAccessible(true);
-
-        // Make `TwigRuntimeLoader->basePath` accessible.
-        $basePathProperty = new ReflectionProperty(TwigRuntimeLoader::class, 'basePath');
-        $basePathProperty->setAccessible(true);
-
-        $this->assertSame($routeParser, $routeParserProperty->getValue($twigRuntimeLoader));
-        $this->assertSame($uri, $uriProperty->getValue($twigRuntimeLoader));
-        $this->assertSame($basePath, $basePathProperty->getValue($twigRuntimeLoader));
+        $this->assertInaccessiblePropertySame($routeParser, $twigRuntimeLoader, 'routeParser');
+        $this->assertInaccessiblePropertySame($uri, $twigRuntimeLoader, 'uri');
+        $this->assertInaccessiblePropertySame($basePath, $twigRuntimeLoader, 'basePath');
     }
 
     public function testLoad()

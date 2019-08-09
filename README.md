@@ -20,7 +20,6 @@ Requires Slim Framework 4 and PHP 7.1 or newer.
 use DI\Container;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
-use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -29,28 +28,32 @@ require __DIR__ . '/vendor/autoload.php';
 $container = new Container();
 AppFactory::setContainer($container);
 
+// Set view in Container
+$container->set('view', function() {
+    return new Twig('path/to/templates', ['cache' => 'path/to/cache']);
+});
+
 // Create App
 $app = new AppFactory::create();
 
 // Add Twig-View Middleware
-$basePath = '/base-path';
-$routeParser = $app->getRouteCollector()->getRouteParser();
-$twig = new Twig('path/to/templates', ['cache' => 'path/to/cache']);
-$twigMiddleware = new TwigMiddleware($twig, $container, $routeParser, $basePath);
-$app->add($twigMiddleware);
+$app->add(TwigMiddleware::create($app));
 
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {
-    return $this->view->render($response, 'profile.html', [
+    return $this->get('view')->render($response, 'profile.html', [
         'name' => $args['name']
     ]);
 })->setName('profile');
 
 // Render from string
 $app->get('/hi/{name}', function ($request, $response, $args) {
-    $str = $this->view->fetchFromString('<p>Hi, my name is {{ name }}.</p>', [
-        'name' => $args['name']
-    ]);
+    $str = $this->get('view')->fetchFromString(
+        '<p>Hi, my name is {{ name }}.</p>',
+        [
+            'name' => $args['name']
+        ]
+    );
     $response->getBody()->write($str);
     return $response;
 });

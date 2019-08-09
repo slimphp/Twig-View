@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
-use DI\Container;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
@@ -17,11 +16,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use ReflectionProperty;
 use RuntimeException;
 use Slim\App;
+use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Interfaces\RouteParserInterface;
-use Slim\Tests\Mocks\MockContainerWithArrayAccess;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
@@ -76,20 +74,33 @@ class TwigMiddlewareTest extends TestCase
 
     public function testCreate()
     {
+        $key = 'twig';
         $twig = $this->createMock(Twig::class);
-
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->with('view')->willReturn($twig);
+        $container
+            ->method('has')
+            ->with($this->equalTo($key))
+            ->willReturn(true);
+        $container
+            ->method('get')
+            ->with($this->equalTo($key))
+            ->willReturn($twig);
 
+        $routeParser = $this->createMock(RouteParserInterface::class);
+        $routeCollector = $this->createMock(RouteCollectorInterface::class);
+        $routeCollector->method('getRouteParser')->willReturn($routeParser);
+
+        $basePath = '/base-path';
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
+        $app->method('getRouteCollector')->willReturn($routeCollector);
+        $app->method('getBasePath')->willReturn($basePath);
 
-        $middleware = TwigMiddleware::create($app, 'view');
+        $middleware = TwigMiddleware::create($app, $key);
 
-        $twigProperty = new ReflectionProperty(TwigMiddleware::class, 'twig');
-        $twigProperty->setAccessible(true);
-
-        $this->assertSame($twig, $twigProperty->getValue($middleware));
+        $this->assertInaccessiblePropertySame($twig, $middleware, 'twig');
+        $this->assertInaccessiblePropertySame($routeParser, $middleware, 'routeParser');
+        $this->assertInaccessiblePropertySame($basePath, $middleware, 'basePath');
     }
 
     /**
@@ -99,35 +110,59 @@ class TwigMiddlewareTest extends TestCase
     public function testCreateWithoutContainer()
     {
         $app = $this->createMock(App::class);
-        TwigMiddleware::create($app, 'view');
+        TwigMiddleware::create($app);
     }
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage Twig could not be found in the container (key=view).
+     * @expectedExceptionMessage The specified container key does not exist: view
      */
-    public function testCreateWithoutTwig()
+    public function testCreateWithoutContainerKey()
     {
         $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(false);
 
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
 
-        TwigMiddleware::create($app, 'view');
+        TwigMiddleware::create($app);
     }
 
-    public function testProcessAppendsTwigExtensionToContainerWithSetMethod()
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Twig instance could not be resolved via container key: view
+     */
+    public function testCreateWithoutTwig()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->method('has')
+            ->with($this->equalTo('view'))
+            ->willReturn(true);
+        $container
+            ->method('get')
+            ->with($this->equalTo('view'))
+            ->willReturn(null);
+
+        $app = $this->createMock(App::class);
+        $app->method('getContainer')->willReturn($container);
+
+        TwigMiddleware::create($app);
+    }
+
+    public function testProcess()
     {
         $basePath = '/base-path';
         $uriProphecy = $this->prophesize(UriInterface::class);
         $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
         $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
-        $container = new Container();
 
         /** @noinspection PhpParamsInspection */
         $twigMiddleware = new TwigMiddleware(
             $twigProphecy->reveal(),
-            $container,
             $routeParserProphecy->reveal(),
             $basePath
         );
@@ -150,85 +185,5 @@ class TwigMiddlewareTest extends TestCase
 
         /** @noinspection PhpParamsInspection */
         $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
-
-        $this->assertSame($twigProphecy->reveal(), $container->get('view'));
-    }
-
-    public function testProcessAppendsTwigExtensionToContainerWithArrayAccess()
-    {
-        $basePath = '/base-path';
-        $uriProphecy = $this->prophesize(UriInterface::class);
-        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
-        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
-        $container = new MockContainerWithArrayAccess();
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware = new TwigMiddleware(
-            $twigProphecy->reveal(),
-            $container,
-            $routeParserProphecy->reveal(),
-            $basePath
-        );
-
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-
-        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestProphecy
-            ->getUri()
-            ->willReturn($uriProphecy->reveal())
-            ->shouldBeCalledOnce();
-
-        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestHandlerProphecy
-            ->handle($requestProphecy->reveal())
-            ->shouldBeCalledOnce()
-            ->willReturn($responseProphecy->reveal());
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
-
-        $this->assertSame($twigProphecy->reveal(), $container->get('view'));
-    }
-
-    public function testSetContainerKey()
-    {
-        $basePath = '/base-path';
-        $uriProphecy = $this->prophesize(UriInterface::class);
-        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
-        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
-        $container = new MockContainerWithArrayAccess();
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware = new TwigMiddleware(
-            $twigProphecy->reveal(),
-            $container,
-            $routeParserProphecy->reveal(),
-            $basePath
-        );
-
-        $twigMiddleware->setContainerKey(Twig::class);
-
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-
-        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestProphecy
-            ->getUri()
-            ->willReturn($uriProphecy->reveal())
-            ->shouldBeCalledOnce();
-
-        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestHandlerProphecy
-            ->handle($requestProphecy->reveal())
-            ->shouldBeCalledOnce()
-            ->willReturn($responseProphecy->reveal());
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
-
-        $this->assertSame($twigProphecy->reveal(), $container->get(Twig::class));
     }
 }

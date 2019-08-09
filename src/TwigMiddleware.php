@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Slim\Views;
 
-use ArrayAccess;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,11 +26,6 @@ class TwigMiddleware implements MiddlewareInterface
     protected $twig;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var RouteParserInterface
      */
     protected $routeParser;
@@ -42,11 +36,6 @@ class TwigMiddleware implements MiddlewareInterface
     protected $basePath;
 
     /**
-     * @var string
-     */
-    protected $containerKey;
-
-    /**
      * @param App    $app
      * @param string $containerKey
      *
@@ -54,53 +43,43 @@ class TwigMiddleware implements MiddlewareInterface
      */
     public static function create(App $app, string $containerKey = 'view'): self
     {
-        if ($app->getContainer() === null) {
+        $container = $app->getContainer();
+        if ($container === null) {
             throw new RuntimeException('The app does not have a container.');
         }
+        if (!$container->has($containerKey)) {
+            throw new RuntimeException(
+                "The specified container key does not exist: $containerKey"
+            );
+        }
 
-        $twig = $app->getContainer()->get($containerKey);
+        $twig = $container->get($containerKey);
         if (!($twig instanceof Twig)) {
-            throw new RuntimeException(sprintf('Twig could not be found in the container (key=%s).', $containerKey));
+            throw new RuntimeException(
+                "Twig instance could not be resolved via container key: $containerKey"
+            );
         }
 
         return new self(
             $twig,
-            $app->getContainer(),
             $app->getRouteCollector()->getRouteParser(),
-            $app->getBasePath(),
-            $containerKey
+            $app->getBasePath()
         );
     }
 
     /**
      * @param Twig                 $twig
-     * @param ContainerInterface   $container
      * @param RouteParserInterface $routeParser
      * @param string               $basePath
-     * @param string               $containerKey
      */
     public function __construct(
         Twig $twig,
-        ContainerInterface $container,
         RouteParserInterface $routeParser,
-        string $basePath = '',
-        string $containerKey = 'view'
+        string $basePath = ''
     ) {
         $this->twig = $twig;
-        $this->container = $container;
         $this->routeParser = $routeParser;
         $this->basePath = $basePath;
-        $this->containerKey = $containerKey;
-    }
-
-    /**
-     * Set the container key.
-     *
-     * @param string $containerKey
-     */
-    public function setContainerKey(string $containerKey): void
-    {
-        $this->containerKey = $containerKey;
     }
 
     /**
@@ -113,12 +92,6 @@ class TwigMiddleware implements MiddlewareInterface
 
         $extension = new TwigExtension();
         $this->twig->addExtension($extension);
-
-        if (method_exists($this->container, 'set')) {
-            $this->container->set($this->containerKey, $this->twig);
-        } elseif ($this->container instanceof ArrayAccess) {
-            $this->container[$this->containerKey] = $this->twig;
-        }
 
         return $handler->handle($request);
     }

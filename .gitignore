@@ -1,3 +1,4 @@
+.*.swp
 .idea
 composer.lock
 clover.xml
