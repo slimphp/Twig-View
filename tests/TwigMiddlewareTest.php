@@ -115,7 +115,7 @@ class TwigMiddlewareTest extends TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage The container does not have key=view.
+     * @expectedExceptionMessage The specified container key does not exist: view
      */
     public function testCreateWithoutContainerKey()
     {
@@ -133,7 +133,7 @@ class TwigMiddlewareTest extends TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage Twig could not be found in the container (key=view).
+     * @expectedExceptionMessage Twig instance could not be resolved via container key: view
      */
     public function testCreateWithoutTwig()
     {

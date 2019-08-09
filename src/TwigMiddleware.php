@@ -49,14 +49,14 @@ class TwigMiddleware implements MiddlewareInterface
         }
         if (!$container->has($containerKey)) {
             throw new RuntimeException(
-                "The container does not have key=$containerKey."
+                "The specified container key does not exist: $containerKey"
             );
         }
 
         $twig = $container->get($containerKey);
         if (!($twig instanceof Twig)) {
             throw new RuntimeException(
-                "Twig could not be found in the container (key=$containerKey)."
+                "Twig instance could not be resolved via container key: $containerKey"
             );
         }
 
