@@ -96,7 +96,7 @@ class TwigMiddlewareTest extends TestCase
         $app->method('getRouteCollector')->willReturn($routeCollector);
         $app->method('getBasePath')->willReturn($basePath);
 
-        $middleware = TwigMiddleware::create($app, $key);
+        $middleware = TwigMiddleware::createFromContainer($app, $key);
 
         $this->assertInaccessiblePropertySame($twig, $middleware, 'twig');
         $this->assertInaccessiblePropertySame($routeParser, $middleware, 'routeParser');
@@ -110,7 +110,7 @@ class TwigMiddlewareTest extends TestCase
     public function testCreateWithoutContainer()
     {
         $app = $this->createMock(App::class);
-        TwigMiddleware::create($app);
+        TwigMiddleware::createFromContainer($app);
     }
 
     /**
@@ -128,7 +128,7 @@ class TwigMiddlewareTest extends TestCase
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
 
-        TwigMiddleware::create($app);
+        TwigMiddleware::createFromContainer($app);
     }
 
     /**
@@ -150,7 +150,7 @@ class TwigMiddlewareTest extends TestCase
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
 
-        TwigMiddleware::create($app);
+        TwigMiddleware::createFromContainer($app);
     }
 
     public function testProcess()

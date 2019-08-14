@@ -46,7 +46,7 @@ class TwigMiddleware implements MiddlewareInterface
      *
      * @return TwigMiddleware
      */
-    public static function create(App $app, string $containerKey = 'view'): self
+    public static function createFromContainer(App $app, string $containerKey = 'view'): self
     {
         $container = $app->getContainer();
         if ($container === null) {
