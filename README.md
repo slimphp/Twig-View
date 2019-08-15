@@ -37,7 +37,7 @@ $container->set('view', function() {
 $app = new AppFactory::create();
 
 // Add Twig-View Middleware
-$app->add(TwigMiddleware::create($app));
+$app->add(TwigMiddleware::createFromContainer($app));
 
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {

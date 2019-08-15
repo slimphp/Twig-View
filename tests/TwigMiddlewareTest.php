@@ -96,7 +96,7 @@ class TwigMiddlewareTest extends TestCase
         $app->method('getRouteCollector')->willReturn($routeCollector);
         $app->method('getBasePath')->willReturn($basePath);
 
-        $middleware = TwigMiddleware::create($app, $key);
+        $middleware = TwigMiddleware::createFromContainer($app, $key);
 
         $this->assertInaccessiblePropertySame($twig, $middleware, 'twig');
         $this->assertInaccessiblePropertySame($routeParser, $middleware, 'routeParser');
@@ -110,7 +110,7 @@ class TwigMiddlewareTest extends TestCase
     public function testCreateWithoutContainer()
     {
         $app = $this->createMock(App::class);
-        TwigMiddleware::create($app);
+        TwigMiddleware::createFromContainer($app);
     }
 
     /**
@@ -128,7 +128,7 @@ class TwigMiddlewareTest extends TestCase
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
 
-        TwigMiddleware::create($app);
+        TwigMiddleware::createFromContainer($app);
     }
 
     /**
@@ -150,7 +150,7 @@ class TwigMiddlewareTest extends TestCase
         $app = $this->createMock(App::class);
         $app->method('getContainer')->willReturn($container);
 
-        TwigMiddleware::create($app);
+        TwigMiddleware::createFromContainer($app);
     }
 
     public function testProcess()
@@ -182,6 +182,62 @@ class TwigMiddlewareTest extends TestCase
             ->handle($requestProphecy->reveal())
             ->shouldBeCalledOnce()
             ->willReturn($responseProphecy->reveal());
+
+        /** @noinspection PhpParamsInspection */
+        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
+    }
+
+    public function testProcessWithRequestContext()
+    {
+        $routeParser = $this->createMock(RouteParserInterface::class);
+        $uriProphecy = $this->prophesize(UriInterface::class);
+
+        /** @var Twig $twig */
+        $twig = $this->createTwigProphecy($uriProphecy, '')->reveal();
+
+        $twigMiddleware = new TwigMiddleware($twig, $routeParser, '', 'view');
+
+        $responseProphecy = $this->prophesize(ResponseInterface::class);
+
+        // Prophesize the server request that would be returned in the `withAttribute` method.
+        $requestProphecy2 = $this->prophesize(ServerRequestInterface::class);
+
+        // Prophesize the server request.
+        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestProphecy->withAttribute('view', Argument::type(Twig::class))
+            ->shouldBeCalledOnce()
+            ->will(function ($args) use ($requestProphecy2): ServerRequestInterface {
+                /** @noinspection PhpUndefinedMethodInspection */
+                $requestProphecy2->getAttribute('view')
+                    ->shouldBeCalledOnce()
+                    ->willReturn($args[1]);
+
+                /** @noinspection PhpIncompatibleReturnTypeInspection */
+                return $requestProphecy2->reveal();
+            });
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestProphecy
+            ->getUri()
+            ->willReturn($uriProphecy->reveal())
+            ->shouldBeCalledOnce();
+
+        // Prophesize the request handler.
+        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
+        $that = $this;
+        /** @noinspection PhpUndefinedMethodInspection */
+        $requestHandlerProphecy
+            ->handle($requestProphecy2->reveal())
+            ->shouldBeCalledOnce()
+            ->will(function ($args) use ($that, $twig, $responseProphecy): ResponseInterface {
+                /** @var ServerRequestInterface $serverRequest */
+                $serverRequest = $args[0];
+                $that->assertSame($twig, $serverRequest->getAttribute('view'));
+
+                /** @noinspection PhpIncompatibleReturnTypeInspection */
+                return $responseProphecy->reveal();
+            });
 
         /** @noinspection PhpParamsInspection */
         $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
