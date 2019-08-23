@@ -11,7 +11,10 @@ namespace Slim\Tests;
 
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 use Slim\Views\Twig;
+use Slim\Views\TwigContext;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\FilesystemLoader;
@@ -19,6 +22,62 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TwigTest extends TestCase
 {
+    public function testFromRequest()
+    {
+        $twig = $this->createMock(Twig::class);
+
+        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
+        $serverRequestProphecy->getAttribute('view')
+            ->willReturn($twig);
+
+        /** @var ServerRequestInterface $serverRequest */
+        $serverRequest = $serverRequestProphecy->reveal();
+        $this->assertSame($twig, Twig::fromRequest($serverRequest));
+    }
+
+    public function testFromRequestCustomAttributeName()
+    {
+        $twig = $this->createMock(Twig::class);
+
+        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
+        $serverRequestProphecy->getAttribute('foo')
+            ->willReturn($twig);
+
+        /** @var ServerRequestInterface $serverRequest */
+        $serverRequest = $serverRequestProphecy->reveal();
+        $this->assertSame($twig, Twig::fromRequest($serverRequest, 'foo'));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Twig could not be found in the server request attributes using the key "view".
+     */
+    public function testFromRequestTwigNotFound()
+    {
+        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
+        $serverRequestProphecy->getAttribute('view')
+            ->willReturn(null);
+
+        /** @var ServerRequestInterface $serverRequest */
+        $serverRequest = $serverRequestProphecy->reveal();
+        Twig::fromRequest($serverRequest);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Twig could not be found in the server request attributes using the key "view".
+     */
+    public function testFromRequestNotTwig()
+    {
+        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
+        $serverRequestProphecy->getAttribute('view')
+            ->willReturn('twiggy');
+
+        /** @var ServerRequestInterface $serverRequest */
+        $serverRequest = $serverRequestProphecy->reveal();
+        Twig::fromRequest($serverRequest);
+    }
+
     public function testAddExtension()
     {
         $view = new Twig(dirname(__FILE__) . '/templates');
