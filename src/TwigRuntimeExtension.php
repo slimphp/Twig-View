@@ -24,10 +24,6 @@ class TwigRuntimeExtension
      */
     public static function relativePath(string $to, string $from): string
     {
-        if ($from === $to) {
-            return '';
-        }
-
         // Remove common path
         if (preg_match("|^(.*/)(.*?)\t\\1(.*?)$|", "$to\t$from", $m)) {
             $to   = $m[2];

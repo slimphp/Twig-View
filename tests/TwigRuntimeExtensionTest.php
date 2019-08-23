@@ -68,9 +68,7 @@ class TwigRuntimeExtensionTest extends TestCase
     public function relativePathProvider()
     {
         return [
-            ['/',                   '/',                    ''],
-            ['/a',                  '/a',                   ''],
-
+            ['/a',                  '/a',                   'a'],
             ['/a',                  '/b',                   'a'],
             ['/one/a',              '/one/b',               'a'],
             ['/one/two/a',          '/one/two/b',           'a'],
@@ -98,6 +96,7 @@ class TwigRuntimeExtensionTest extends TestCase
             ['/a',                  '/a/b/c/',              '../../../a'],
             ['/a',                  '/a/b/c/d',             '../../../a'],
 
+            ['/',                   '/',                    './'],
             ['/',                   '/a',                   './'],
         ];
     }
@@ -253,7 +252,7 @@ class TwigRuntimeExtensionTest extends TestCase
     public function relativeUrlForProvider()
     {
         return [
-             ['',           '/user/1/',  '',    '/user/{id}/',     ['id' => 1], [],           ''],
+             ['',           '/user/1/',  '',    '/user/{id}/',     ['id' => 1], [],           './'],
              ['/base-path', '/user/1/',  'a=b', '/user/{id}/edit', ['id' => 1], [],           'edit'],
              ['',           '/user/1/',  'a=b', '/user/',          [],          ['s' => 'n'], '../?s=n'],
              ['/base-path', '/user/add', '',    '/user/',          [],          ['p' => 2],   './?p=2'],
