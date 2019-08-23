@@ -14,14 +14,17 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\Loader\LoaderInterface;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TwigTest extends TestCase
 {
     public function testAddExtension()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
 
         $mock = $this->createMock(ExtensionInterface::class);
         $view->addExtension($mock);
@@ -30,7 +33,8 @@ class TwigTest extends TestCase
 
     public function testAddRuntimeLoader()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
 
         // Mock a runtime extension.
         $runtimeExtension = $this->createMock(RuntimeExtensionInterface::class);
@@ -53,7 +57,10 @@ class TwigTest extends TestCase
 
     public function testFetch()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = new ArrayLoader([
+            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
+        ]);
+        $view = new Twig($loader);
 
         $output = $view->fetch('example.html', [
             'name' => 'Josh'
@@ -64,7 +71,8 @@ class TwigTest extends TestCase
 
     public function testFetchFromString()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
 
         $output = $view->fetchFromString("<p>Hi, my name is {{ name }}.</p>", [
             'name' => 'Josh'
@@ -75,7 +83,13 @@ class TwigTest extends TestCase
 
     public function testFetchBlock()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = new ArrayLoader([
+            'block_example.html' => <<<EOF
+{% block first %}<p>Hi, my name is {{name}}.</p>{% endblock %}
+{% block second %}<p>My name is not {{name}}.</p>{% endblock %}
+EOF
+        ]);
+        $view = new Twig($loader);
 
         $outputOne = $view->fetchBlock('block_example.html', 'first', [
             'name' => 'Josh'
@@ -93,7 +107,7 @@ class TwigTest extends TestCase
     {
         $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
 
-        $view = new Twig(
+        $view = Twig::create(
             [
                 'namespace' => [
                     __DIR__.'/another',
@@ -123,7 +137,7 @@ class TwigTest extends TestCase
 
     public function testArrayWithASingleTemplateWithANamespace()
     {
-        $views = new Twig([
+        $views = Twig::create([
             'One' => [
                 __DIR__.'/templates',
             ],
@@ -138,7 +152,7 @@ class TwigTest extends TestCase
 
     public function testASingleTemplateWithANamespace()
     {
-        $views = new Twig([
+        $views = Twig::create([
             'One' => __DIR__.'/templates',
         ]);
 
@@ -153,7 +167,7 @@ class TwigTest extends TestCase
     {
         $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
 
-        $views = new Twig([
+        $views = Twig::create([
             'One'   => __DIR__.'/templates',
             'Two'   => __DIR__.'/another',
             'Three' => [
@@ -182,7 +196,7 @@ class TwigTest extends TestCase
     public function testMultipleDirectoriesWithoutNamespaces()
     {
         $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
-        $view    = new Twig([__DIR__.'/multi/', __DIR__.'/another/']);
+        $view    = Twig::create([__DIR__.'/multi/', __DIR__.'/another/']);
 
         $rootDirectory = $view->fetch('directory/template/example.html', [
             'weekday' => $weekday,
@@ -198,7 +212,10 @@ class TwigTest extends TestCase
 
     public function testRender()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = new ArrayLoader([
+            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
+        ]);
+        $view = new Twig($loader);
 
         $mockBody = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
             ->disableOriginalConstructor()
@@ -225,14 +242,15 @@ class TwigTest extends TestCase
 
     public function testGetLoader()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
-        $loader = $view->getLoader();
-        $this->assertEquals(FilesystemLoader::class, get_class($loader));
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
+        $this->assertSame($loader, $view->getLoader());
     }
 
     public function testOffsetExists()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
         $view->offsetSet('foo', 'bar');
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertFalse($view->offsetExists('moo'));
@@ -240,7 +258,8 @@ class TwigTest extends TestCase
 
     public function testArrayAccess()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
         $view->offsetSet('foo', 'bar');
         $this->assertEquals('bar', $view['foo']);
         $this->assertFalse(isset($view['moo']));
@@ -248,14 +267,16 @@ class TwigTest extends TestCase
 
     public function testOffsetGet()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
         $view->offsetSet('foo', 'bar');
         $this->assertEquals('bar', $view->offsetGet('foo'));
     }
 
     public function testOffsetUnset()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
         $view->offsetSet('foo', 'bar');
         $view->offsetUnset('foo');
         $this->assertFalse($view->offsetExists('foo'));
@@ -263,14 +284,16 @@ class TwigTest extends TestCase
 
     public function testCount()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
         $view->offsetSet('foo', 'bar');
         $this->assertEquals(1, $view->count());
     }
 
     public function testGetIterator()
     {
-        $view = new Twig(dirname(__FILE__) . '/templates');
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
         $view->offsetSet('foo', 'bar');
         $iterator = $view->getIterator();
         $this->assertEquals(['foo' => 'bar'], $iterator->getArrayCopy());
