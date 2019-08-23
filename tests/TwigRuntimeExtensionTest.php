@@ -112,33 +112,33 @@ class TwigRuntimeExtensionTest extends TestCase
     public function currentUrlProvider()
     {
         return [
-            ['/hello/{name}', 'http://example.com/hello/world?a=b', '', true],
-            ['/hello/{name}', 'http://example.com/hello/world', '', false],
-            ['/base-path/hello/{name}', 'http://example.com/base-path/hello/world?a=b', '/base-path', true],
-            ['/base-path/hello/{name}', 'http://example.com/base-path/hello/world', '/base-path', false],
+            ['', '/hello/world', '', false, '/hello/world'],
+            ['', '/hello/world', '', true, '/hello/world'],
+            ['', '/hello/world', 'a=b', false, '/hello/world'],
+            ['', '/hello/world', 'a=b', true, '/hello/world?a=b'],
+
+            ['/base-path', '/hello/world', '', false, '/base-path/hello/world'],
+            ['/base-path', '/hello/world', '', true, '/base-path/hello/world'],
+            ['/base-path', '/hello/world', 'a=b', false, '/base-path/hello/world'],
+            ['/base-path', '/hello/world', 'a=b', true, '/base-path/hello/world?a=b'],
         ];
     }
 
     /**
      * @dataProvider currentUrlProvider
      *
-     * @param string $pattern
-     * @param string $url
      * @param string $basePath
+     * @param string $path
+     * @param string $query
      * @param bool   $withQueryString
+     * @param string $expected
      */
-    public function testCurrentUrl(string $pattern, string $url, string $basePath, bool $withQueryString)
+    public function testCurrentUrl(string $basePath, string $path, string $query, bool $withQueryString, string $expected)
     {
         $routeCollector = $this->createRouteCollector($basePath);
         $routeParser = $routeCollector->getRouteParser();
 
-        $routeName = 'route';
-        $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
-
         $uriProphecy = $this->prophesize(UriInterface::class);
-
-        $path = parse_url($url, PHP_URL_PATH);
-        $query = parse_url($url, PHP_URL_QUERY);
 
         /** @noinspection PhpUndefinedMethodInspection */
         $uriProphecy
@@ -151,11 +151,6 @@ class TwigRuntimeExtensionTest extends TestCase
             ->getQuery()
             ->willReturn($query)
             ->shouldBeCalledOnce();
-
-        $expected = $basePath . $path;
-        if ($withQueryString) {
-            $expected .= '?' . $query;
-        }
 
         /** @var UriInterface $uri */
         $uri = $uriProphecy->reveal();
