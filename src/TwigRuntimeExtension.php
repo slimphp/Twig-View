@@ -15,15 +15,27 @@ use Slim\Interfaces\RouteParserInterface;
 class TwigRuntimeExtension
 {
     /**
-     * Get the relative path of $to from $from path
+     * Get the relative url of $to from $from url
      *
-     * @param string $to    Destination path
-     * @param string $from  Current path
+     * @param string $to    Destination url
+     * @param string $from  Current url
      *
      * @return string
      */
-    public static function relativePath(string $to, string $from): string
+    public static function relativeUrl(string $to, string $from): string
     {
+        if ($from === $to) {
+            return '';
+        }
+
+        if (preg_match('/^([^?]+)([?].*)/', $to, $m)) {
+            $to    = $m[1];
+            $query = $m[2];
+        } else {
+            $query = '';
+        }
+        $from = preg_replace('/[?].*/', '', $from);
+
         // Remove common path
         if (preg_match("|^(.*/)(.*?)\t\\1(.*?)$|", "$to\t$from", $m)) {
             $to   = $m[2];
@@ -36,11 +48,14 @@ class TwigRuntimeExtension
         } else {
             $goback = '';
         }
-
         if ($goback || $to) {
-            return $goback.$to;
+            return $goback.$to.$query;
         }
-        return './';
+
+        if ($query && $from === $to) {
+            return $query;
+        }
+        return './'.$query;
     }
 
     /**
@@ -95,13 +110,8 @@ class TwigRuntimeExtension
      */
     public function relativeUrlFor(string $routeName, array $data = [], array $queryParams = []): string
     {
-        $path = $this->urlFor($routeName, $data);
-        $path = self::relativePath($path, $this->getCurrentUrl());
-        if ($queryParams) {
-            $path .= '?' . http_build_query($queryParams);
-        }
-
-        return $path;
+        $url = $this->routeParser->urlFor($routeName, $data, $queryParams);
+        return self::relativeUrl($url, $this->getCurrentUrl(true));
     }
 
     /**

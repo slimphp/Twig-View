@@ -65,10 +65,16 @@ class TwigRuntimeExtensionTest extends TestCase
         return $route;
     }
 
-    public function relativePathProvider()
+    public function relativeUrlProvider()
     {
         return [
-            ['/a',                  '/a',                   'a'],
+            ['/a',                  '/a',                   ''],
+            ['/a?b=c',              '/a?b=c',               ''],
+            ['/a?b=c',              '/a?b=d',               'a?b=c'],
+            ['/',                   '/',                    ''],
+            ['/?b=c',               '/?b=c',                ''],
+            ['/?b=c',               '/?b=d',                '?b=c'],
+
             ['/a',                  '/b',                   'a'],
             ['/one/a',              '/one/b',               'a'],
             ['/one/two/a',          '/one/two/b',           'a'],
@@ -96,21 +102,21 @@ class TwigRuntimeExtensionTest extends TestCase
             ['/a',                  '/a/b/c/',              '../../../a'],
             ['/a',                  '/a/b/c/d',             '../../../a'],
 
-            ['/',                   '/',                    './'],
             ['/',                   '/a',                   './'],
+            ['/?b=c',               '/a',                   './?b=c'],
         ];
     }
 
     /**
-     * @dataProvider relativePathProvider
+     * @dataProvider relativeUrlProvider
      *
      * @param string      $to
      * @param string      $from
      * @param string      $expected
      */
-    public function testRelativePath(string $to, string $from, string $expected)
+    public function testRelativeUrl(string $to, string $from, string $expected)
     {
-        $this->assertEquals($expected, TwigRuntimeExtension::relativePath($to, $from));
+        $this->assertEquals($expected, TwigRuntimeExtension::relativeUrl($to, $from));
     }
 
     public function isCurrentUrlProvider()
@@ -252,9 +258,10 @@ class TwigRuntimeExtensionTest extends TestCase
     public function relativeUrlForProvider()
     {
         return [
-             ['',           '/user/1/',  '',    '/user/{id}/',     ['id' => 1], [],           './'],
+             ['',           '/user/1/',  '',    '/user/{id}/',     ['id' => 1], [],           ''],
              ['/base-path', '/user/1/',  'a=b', '/user/{id}/edit', ['id' => 1], [],           'edit'],
              ['',           '/user/1/',  'a=b', '/user/',          [],          ['s' => 'n'], '../?s=n'],
+             ['',           '/user/',    's=a', '/user/',          [],          ['s' => 'b'], '?s=b'],
              ['/base-path', '/user/add', '',    '/user/',          [],          ['p' => 2],   './?p=2'],
         ];
     }
@@ -311,13 +318,7 @@ class TwigRuntimeExtensionTest extends TestCase
             ['/hello/{name}', ['name' => 'world'], [], '', 'http://localhost/hello/world'],
             ['/hello/{name}', ['name' => 'world'], [], '/base-path', 'http://localhost/base-path/hello/world'],
             ['/hello/{name}', ['name' => 'world'], ['foo' => 'bar'], '', 'http://localhost/hello/world?foo=bar'],
-            [
-                '/hello/{name}',
-                ['name' => 'world'],
-                ['foo' => 'bar'],
-                '/base-path',
-                'http://localhost/base-path/hello/world?foo=bar',
-            ],
+            ['/hello/{name}', ['name' => 'world'], ['foo' => 'bar'], '/base-path', 'http://localhost/base-path/hello/world?foo=bar'],
         ];
     }
 
