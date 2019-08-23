@@ -67,6 +67,7 @@ $app->run();
 `TwigExtension` provides these functions to your Twig templates:
 
 * `url_for()` - returns the URL for a given route. e.g.: /hello/world
+* `relative_url_for()` - returns the relative URL for a given route. e.g.: ../world
 * `full_url_for()` - returns the URL for a given route. e.g.: http://www.example.com/hello/world
 * `is_current_url()` - returns true is the provided route name and parameters are valid for the current path.
 * `current_url()` - returns the current path, with or without the query string.

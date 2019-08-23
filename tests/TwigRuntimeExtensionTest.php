@@ -65,6 +65,55 @@ class TwigRuntimeExtensionTest extends TestCase
         return $route;
     }
 
+    public function relativePathProvider()
+    {
+        return [
+            ['/',                   '/',                    ''],
+            ['/a',                  '/a',                   ''],
+
+            ['/a',                  '/b',                   'a'],
+            ['/one/a',              '/one/b',               'a'],
+            ['/one/two/a',          '/one/two/b',           'a'],
+            ['/one/two/three/a',    '/one/two/three/b',     'a'],
+
+            ['/a/b',                '/c',                   'a/b'],
+            ['/a/b',                '/a',                   'a/b'],
+
+            ['/',                   '/a/',                  '../'],
+            ['/',                   '/a/b',                 '../'],
+            ['/',                   '/a/b/',                '../../'],
+            ['/',                   '/a/b/c',               '../../'],
+            ['/',                   '/a/b/c/',              '../../../'],
+            ['/',                   '/a/b/c/d',             '../../../'],
+
+            ['/a',                  '/b/c',                 '../a'],
+            ['/a',                  '/b/c/',                '../../a'],
+            ['/a',                  '/b/c/d',               '../../a'],
+            ['/a',                  '/b/c/d/',              '../../../a'],
+            ['/a',                  '/b/c/d/e',             '../../../a'],
+
+            ['/a',                  '/a/b',                 '../a'],
+            ['/a',                  '/a/b/',                '../../a'],
+            ['/a',                  '/a/b/c',               '../../a'],
+            ['/a',                  '/a/b/c/',              '../../../a'],
+            ['/a',                  '/a/b/c/d',             '../../../a'],
+
+            ['/',                   '/a',                   './'],
+        ];
+    }
+
+    /**
+     * @dataProvider relativePathProvider
+     *
+     * @param string      $to
+     * @param string      $from
+     * @param string      $expected
+     */
+    public function testRelativePath(string $to, string $from, string $expected)
+    {
+        $this->assertEquals($expected, TwigRuntimeExtension::relativePath($to, $from));
+    }
+
     public function isCurrentUrlProvider()
     {
         return [
@@ -199,6 +248,62 @@ class TwigRuntimeExtensionTest extends TestCase
 
         $extension = new TwigRuntimeExtension($routeCollector->getRouteParser(), $uri, $routeCollector->getBasePath());
         $this->assertEquals($expectedUrl, $extension->urlFor($routeName, $routeData, $queryParams));
+    }
+
+    public function relativeUrlForProvider()
+    {
+        return [
+             ['',           '/user/1/',  '',    '/user/{id}/',     ['id' => 1], [],           ''],
+             ['/base-path', '/user/1/',  'a=b', '/user/{id}/edit', ['id' => 1], [],           'edit'],
+             ['',           '/user/1/',  'a=b', '/user/',          [],          ['s' => 'n'], '../?s=n'],
+             ['/base-path', '/user/add', '',    '/user/',          [],          ['p' => 2],   './?p=2'],
+        ];
+    }
+
+    /**
+     * @dataProvider relativeUrlForProvider
+     *
+     * @param string $basePath
+     * @param string $path
+     * @param string $query
+     * @param string $pattern
+     * @param array  $routeData
+     * @param array  $queryParams
+     * @param string $expectedUrl
+     */
+    public function testRelativeUrlFor(
+        string $basePath,
+        string $path,
+        string $query,
+        string $pattern,
+        array $routeData,
+        array $queryParams,
+        string $expectedUrl
+    ) {
+        $routeName = 'route';
+
+        $routeCollector = $this->createRouteCollector($basePath);
+        $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
+
+        $uriProphecy = $this->prophesize(UriInterface::class);
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $uriProphecy
+            ->getPath()
+            ->willReturn($path)
+            ->shouldBeCalledOnce();
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $uriProphecy
+            ->getQuery()
+            ->willReturn($query)
+            ->shouldBeCalledOnce();
+
+        /** @var UriInterface $uri */
+        $uri = $uriProphecy->reveal();
+
+        $extension = new TwigRuntimeExtension($routeCollector->getRouteParser(), $uri, $routeCollector->getBasePath());
+        $this->assertEquals($expectedUrl, $extension->relativeUrlFor($routeName, $routeData, $queryParams));
     }
 
     public function fullUrlForProvider()

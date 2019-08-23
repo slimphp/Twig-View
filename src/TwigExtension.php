@@ -29,6 +29,7 @@ class TwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('url_for', [TwigRuntimeExtension::class, 'urlFor']),
+            new TwigFunction('relative_url_for', [TwigRuntimeExtension::class, 'relativeUrlFor']),
             new TwigFunction('full_url_for', [TwigRuntimeExtension::class, 'fullUrlFor']),
             new TwigFunction('is_current_url', [TwigRuntimeExtension::class, 'isCurrentUrl']),
             new TwigFunction('current_url', [TwigRuntimeExtension::class, 'getCurrentUrl']),

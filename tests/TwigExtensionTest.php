@@ -21,7 +21,7 @@ class TwigExtensionTest extends TestCase
 
     public function testGetFunctions()
     {
-        $expectedFunctionNames = ['url_for', 'full_url_for', 'is_current_url', 'current_url', 'get_uri'];
+        $expectedFunctionNames = ['url_for', 'relative_url_for', 'full_url_for', 'is_current_url', 'current_url', 'get_uri'];
 
         $extension = new TwigExtension();
         $functions = $extension->getFunctions();
