@@ -36,6 +36,10 @@ class TwigRuntimeExtension
         }
         $from = preg_replace('/[?].*/', '', $from);
 
+        if ($query && $from === $to) {
+            return $query;
+        }
+
         // Remove common path
         if (preg_match("|^(.*/)(.*?)\t\\1(.*?)$|", "$to\t$from", $m)) {
             $to   = $m[2];
@@ -52,9 +56,6 @@ class TwigRuntimeExtension
             return $goback.$to.$query;
         }
 
-        if ($query && $from === $to) {
-            return $query;
-        }
         return './'.$query;
     }
 

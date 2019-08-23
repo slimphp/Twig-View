@@ -69,9 +69,14 @@ class TwigRuntimeExtensionTest extends TestCase
     {
         return [
             ['/a',                  '/a',                   ''],
+            ['/a',                  '/a?b=c',               'a'],
+            ['/a?b=c',              '/a',                   '?b=c'],
             ['/a?b=c',              '/a?b=c',               ''],
-            ['/a?b=c',              '/a?b=d',               'a?b=c'],
+            ['/a?b=c',              '/a?b=d',               '?b=c'],
+
             ['/',                   '/',                    ''],
+            ['/',                   '/?b=c',                './'],
+            ['/?b=c',               '/',                    '?b=c'],
             ['/?b=c',               '/?b=c',                ''],
             ['/?b=c',               '/?b=d',                '?b=c'],
 
@@ -103,7 +108,9 @@ class TwigRuntimeExtensionTest extends TestCase
             ['/a',                  '/a/b/c/d',             '../../../a'],
 
             ['/',                   '/a',                   './'],
+            ['/',                   '/a?b=c',               './'],
             ['/?b=c',               '/a',                   './?b=c'],
+            ['/?b=c',               '/a?b=c',               './?b=c'],
         ];
     }
 
