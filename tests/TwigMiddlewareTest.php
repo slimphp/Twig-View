@@ -72,7 +72,7 @@ class TwigMiddlewareTest extends TestCase
         return $twigProphecy;
     }
 
-    public function testCreate()
+    public function testCreateFromContainer()
     {
         $key = 'twig';
         $twig = $this->createMock(Twig::class);
@@ -107,7 +107,7 @@ class TwigMiddlewareTest extends TestCase
      * @expectedException RuntimeException
      * @expectedExceptionMessage The app does not have a container.
      */
-    public function testCreateWithoutContainer()
+    public function testCreateFromContainerWithoutContainer()
     {
         $app = $this->createMock(App::class);
         TwigMiddleware::createFromContainer($app);
@@ -117,7 +117,7 @@ class TwigMiddlewareTest extends TestCase
      * @expectedException RuntimeException
      * @expectedExceptionMessage The specified container key does not exist: view
      */
-    public function testCreateWithoutContainerKey()
+    public function testCreateFromContainerWithoutContainerKey()
     {
         $container = $this->createMock(ContainerInterface::class);
         $container
@@ -135,7 +135,7 @@ class TwigMiddlewareTest extends TestCase
      * @expectedException RuntimeException
      * @expectedExceptionMessage Twig instance could not be resolved via container key: view
      */
-    public function testCreateWithoutTwig()
+    public function testCreateFromContainerWithoutTwig()
     {
         $container = $this->createMock(ContainerInterface::class);
         $container
@@ -151,6 +151,28 @@ class TwigMiddlewareTest extends TestCase
         $app->method('getContainer')->willReturn($container);
 
         TwigMiddleware::createFromContainer($app);
+    }
+
+    public function testCreate()
+    {
+        $routeParser = $this->createMock(RouteParserInterface::class);
+        $routeCollector = $this->createMock(RouteCollectorInterface::class);
+        $routeCollector->method('getRouteParser')->willReturn($routeParser);
+
+        $basePath = '/base-path';
+        $app = $this->createMock(App::class);
+        $app->method('getRouteCollector')->willReturn($routeCollector);
+        $app->method('getBasePath')->willReturn($basePath);
+
+        $twig = $this->createMock(Twig::class);
+        $attributeName = 'twig';
+
+        $middleware = TwigMiddleware::create($app, $twig, $attributeName);
+
+        $this->assertInaccessiblePropertySame($twig, $middleware, 'twig');
+        $this->assertInaccessiblePropertySame($routeParser, $middleware, 'routeParser');
+        $this->assertInaccessiblePropertySame($basePath, $middleware, 'basePath');
+        $this->assertInaccessiblePropertySame($attributeName, $middleware, 'attributeName');
     }
 
     public function testProcess()
@@ -187,7 +209,7 @@ class TwigMiddlewareTest extends TestCase
         $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
     }
 
-    public function testProcessWithRequestContext()
+    public function testProcessWithRequestAttribute()
     {
         $routeParser = $this->createMock(RouteParserInterface::class);
         $uriProphecy = $this->prophesize(UriInterface::class);
