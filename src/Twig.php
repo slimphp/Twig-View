@@ -12,6 +12,8 @@ namespace Slim\Views;
 use ArrayAccess;
 use ArrayIterator;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -52,6 +54,24 @@ class Twig implements ArrayAccess
      * @var array
      */
     protected $defaultVariables = [];
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param string                 $attributeName
+     *
+     * @return Twig
+     */
+    public static function fromRequest(ServerRequestInterface $request, string $attributeName = 'view'): self
+    {
+        $twig = $request->getAttribute($attributeName);
+        if ($twig === null || !($twig instanceof self)) {
+            throw new RuntimeException(
+                'Twig could not be found in the server request attributes using the key "'. $attributeName .'".'
+            );
+        }
+
+        return $twig;
+    }
 
     /**
      * @param string|array $path     Path(s) to templates directory
