@@ -99,14 +99,13 @@ class TwigRuntimeExtension
      */
     public function relativeUrlFor(string $routeName, array $data = [], array $queryParams = []): string
     {
-        $path  = $this->urlFor($routeName, $data, $queryParams);
-        $query = '';
-        if (preg_match('/^([^?]+)([?].*)/', $path, $m)) {
-            $path  = $m[1];
-            $query = $m[2];
+        $path = $this->urlFor($routeName, $data);
+        $path = self::relativePath($path, $this->getCurrentUrl());
+        if ($queryParams) {
+            $path .= '?' . http_build_query($queryParams);
         }
 
-        return self::relativePath($path, $this->getCurrentUrl()).$query;
+        return $path;
     }
 
     /**
