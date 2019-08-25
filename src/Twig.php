@@ -78,10 +78,32 @@ class Twig implements ArrayAccess
      * @param array        $settings Twig environment settings
      *
      * @throws LoaderError When the template cannot be found
+     *
+     * @return Twig
      */
-    public function __construct($path, array $settings = [])
+    public static function create($path, array $settings = []): self
     {
-        $this->loader = $this->createLoader(is_string($path) ? [$path] : $path);
+        $loader = new FilesystemLoader();
+
+        $paths = is_array($path) ? $path : [$path];
+        foreach ($paths as $namespace => $path) {
+            if (is_string($namespace)) {
+                $loader->setPaths($path, $namespace);
+            } else {
+                $loader->addPath($path);
+            }
+        }
+
+        return new self($loader, $settings);
+    }
+
+    /**
+     * @param LoaderInterface $loader   Twig loader
+     * @param array           $settings Twig environment settings
+     */
+    public function __construct(LoaderInterface $loader, array $settings = [])
+    {
+        $this->loader = $loader;
         $this->environment = new Environment($this->loader, $settings);
     }
 
@@ -180,30 +202,6 @@ class Twig implements ArrayAccess
         $response->getBody()->write($this->fetch($template, $data));
 
         return $response;
-    }
-
-    /**
-     * Create a loader with the given path
-     *
-     * @param array $paths
-     *
-     * @throws LoaderError When the template cannot be found
-     *
-     * @return FilesystemLoader
-     */
-    private function createLoader(array $paths): FilesystemLoader
-    {
-        $loader = new FilesystemLoader();
-
-        foreach ($paths as $namespace => $path) {
-            if (is_string($namespace)) {
-                $loader->setPaths($path, $namespace);
-            } else {
-                $loader->addPath($path);
-            }
-        }
-
-        return $loader;
     }
 
     /**
