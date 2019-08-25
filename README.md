@@ -30,7 +30,7 @@ AppFactory::setContainer($container);
 
 // Set view in Container
 $container->set('view', function() {
-    return new Twig('path/to/templates', ['cache' => 'path/to/cache']);
+    return Twig::create('path/to/templates', ['cache' => 'path/to/cache']);
 });
 
 // Create App
@@ -75,7 +75,7 @@ require __DIR__ . '/vendor/autoload.php';
 $app = new AppFactory::create();
 
 // Create Twig
-$twig = new Twig('path/to/templates', ['cache' => 'path/to/cache']);
+$twig = Twig::create('path/to/templates', ['cache' => 'path/to/cache']);
 
 // Add Twig-View Middleware
 $app->add(TwigMiddleware::create($app, $twig));
