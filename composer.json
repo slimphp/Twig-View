@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Slim Framework 4 view helper built on top of the Twig 2 templating component",
     "keywords": ["slim","framework","view","template","twig"],
-    "homepage": "http://slimframework.com",
+    "homepage": "https://www.slimframework.com",
     "license": "MIT",
     "authors": [
         {
