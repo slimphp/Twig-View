@@ -32,7 +32,7 @@ AppFactory::setContainer($container);
 
 // Set view in Container
 $container->set('view', function() {
-    return Twig::create('path/to/templates', ['cache' => 'path/to/cache']);
+    return new Twig('path/to/templates', ['cache' => 'path/to/cache']);
 });
 
 // Create App
