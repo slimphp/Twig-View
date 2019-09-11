@@ -9,4 +9,5 @@
 /.travis.yml        export-ignore
 /CONTRIBUTING.md    export-ignore
 /README.md          export-ignore
+/phpcs.xml          export-ignore
 /phpunit.xml.dist   export-ignore

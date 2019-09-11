@@ -19,6 +19,7 @@ before_script:
 script:
   - if [[ "$ANALYSIS" != 'true' ]]; then vendor/bin/phpunit ; fi
   - if [[ "$ANALYSIS" == 'true' ]]; then vendor/bin/phpunit --coverage-clover clover.xml ; fi
+  - if [[ "$ANALYSIS" == 'true' ]]; then vendor/bin/phpcs ; fi
 
 after_success:
   - if [[ "$ANALYSIS" == 'true' ]]; then vendor/bin/php-coveralls --coverage_clover=clover.xml -v ; fi
