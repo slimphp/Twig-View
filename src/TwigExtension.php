@@ -33,6 +33,7 @@ class TwigExtension extends AbstractExtension
             new TwigFunction('is_current_url', [TwigRuntimeExtension::class, 'isCurrentUrl']),
             new TwigFunction('current_url', [TwigRuntimeExtension::class, 'getCurrentUrl']),
             new TwigFunction('get_uri', [TwigRuntimeExtension::class, 'getUri']),
+			new TwigFunction('base_path', [TwigRuntimeExtension::class, 'getBasePath']),
         ];
     }
 }
