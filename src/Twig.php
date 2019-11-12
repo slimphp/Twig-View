@@ -245,6 +245,9 @@ class Twig implements ArrayAccess
      */
     public function offsetGet($key)
     {
+        if (!$this->offsetExists($key)) {
+            return null;
+        }
         return $this->defaultVariables[$key];
     }
 
