@@ -332,6 +332,13 @@ EOF
         $this->assertEquals('bar', $view->offsetGet('foo'));
     }
 
+    public function testOffsetGetUndefined()
+    {
+        $loader = $this->createMock(LoaderInterface::class);
+        $view = new Twig($loader);
+        $this->assertNull($view->offsetGet('foo'));
+    }
+
     public function testOffsetUnset()
     {
         $loader = $this->createMock(LoaderInterface::class);
