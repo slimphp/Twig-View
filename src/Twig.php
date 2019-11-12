@@ -30,7 +30,7 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
  * This class is a Slim Framework view helper built on top of the Twig templating component.
  * Twig is a PHP component created by Fabien Potencier.
  *
- * @link http://twig.sensiolabs.org/
+ * @link https://twig.symfony.com/
  */
 class Twig implements ArrayAccess
 {
