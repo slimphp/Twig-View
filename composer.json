@@ -1,7 +1,7 @@
 {
     "name": "slim/twig-view",
     "type": "library",
-    "description": "Slim Framework 4 view helper built on top of the Twig 2 templating component",
+    "description": "Slim Framework 4 view helper built on top of the Twig (2 and 3) templating component",
     "keywords": ["slim","framework","view","template","twig"],
     "homepage": "https://www.slimframework.com",
     "license": "MIT",
@@ -21,7 +21,7 @@
         "php": "^7.1",
         "psr/http-message": "^1.0",
         "slim/slim": "^4.0",
-        "twig/twig": "^2.8"
+        "twig/twig": "^2.8|^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",
