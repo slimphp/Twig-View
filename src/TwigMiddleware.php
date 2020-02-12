@@ -138,6 +138,7 @@ class TwigMiddleware implements MiddlewareInterface
     public function getLoader(ServerRequestInterface $request): RuntimeLoaderInterface
     {
         $version = $this->twig->getEnvironment()::VERSION;
+
         if (version_compare($version, '3.0', '>=')) {
             return new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
         }
