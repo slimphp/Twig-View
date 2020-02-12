@@ -5,8 +5,6 @@
  * @license   https://github.com/slimphp/Twig-View/blob/master/LICENSE.md (MIT License)
  */
 
-declare(strict_types=1);
-
 namespace Slim\Views;
 
 use Psr\Http\Message\UriInterface;
@@ -47,7 +45,7 @@ class TwigRuntimeLoader implements RuntimeLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load(string $class)
+    public function load($class)
     {
         if (TwigRuntimeExtension::class === $class) {
             return new $class($this->routeParser, $this->uri, $this->basePath);
