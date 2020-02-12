@@ -17,9 +17,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 use Slim\App;
 use Slim\Interfaces\RouteParserInterface;
-use Slim\Views\TwigRuntimeLoader;
-use Slim\Views\TwigRuntimeLoaderPHP71;
-use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TwigMiddleware implements MiddlewareInterface
 {
@@ -115,7 +112,7 @@ class TwigMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $runtimeLoader = $this->getLoader($request);
+        $runtimeLoader = new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
         $this->twig->addRuntimeLoader($runtimeLoader);
 
         $extension = new TwigExtension();
@@ -126,22 +123,5 @@ class TwigMiddleware implements MiddlewareInterface
         }
 
         return $handler->handle($request);
-    }
-
-    /**
-     * support PHP < 7.2.5 || Twig 2.x loader declaration
-     *
-     * @param ServerRequestInterface    $request
-     *
-     * @return RuntimeLoaderInterface
-     */
-    public function getLoader(ServerRequestInterface $request): RuntimeLoaderInterface
-    {
-        $version = $this->twig->getEnvironment()::VERSION;
-        if (version_compare($version, '3.0', '>=')) {
-            return new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
-        }
-
-        return new TwigRuntimeLoaderPHP71($this->routeParser, $request->getUri(), $this->basePath);
     }
 }
