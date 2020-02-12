@@ -25,17 +25,6 @@ use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
 use Slim\Views\TwigRuntimeExtension;
 use Slim\Views\TwigRuntimeLoader;
-use Twig\Environment;
-
-class MockTwigEnvironment extends Environment
-{
-    const VERSION = '2.0';
-}
-
-class MockTwig3Environment extends Environment
-{
-    const VERSION = '3.0';
-}
 
 class TwigMiddlewareTest extends TestCase
 {
@@ -47,17 +36,11 @@ class TwigMiddlewareTest extends TestCase
      *
      * @return ObjectProphecy
      */
-    private function createTwigProphecy(ObjectProphecy $uriProphecy, string $basePath, string $version): ObjectProphecy
+    private function createTwigProphecy(ObjectProphecy $uriProphecy, string $basePath): ObjectProphecy
     {
         $self = $this;
 
         $twigProphecy = $this->prophesize(Twig::class);
-
-        $environment = $this->createMock(MockTwigEnvironment::class);
-        if (version_compare($version, '3.0', '>=')) {
-            $environment = $this->createMock(MockTwig3Environment::class);
-        }
-        $twigProphecy->getEnvironment()->willReturn($environment);
 
         /** @noinspection PhpUndefinedMethodInspection */
         $twigProphecy
@@ -196,41 +179,7 @@ class TwigMiddlewareTest extends TestCase
     {
         $basePath = '/base-path';
         $uriProphecy = $this->prophesize(UriInterface::class);
-        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath, '2.0');
-        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware = new TwigMiddleware(
-            $twigProphecy->reveal(),
-            $routeParserProphecy->reveal(),
-            $basePath
-        );
-
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-
-        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestProphecy
-            ->getUri()
-            ->willReturn($uriProphecy->reveal())
-            ->shouldBeCalledOnce();
-
-        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
-        /** @noinspection PhpUndefinedMethodInspection */
-        $requestHandlerProphecy
-            ->handle($requestProphecy->reveal())
-            ->shouldBeCalledOnce()
-            ->willReturn($responseProphecy->reveal());
-
-        /** @noinspection PhpParamsInspection */
-        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
-    }
-
-    public function testProcessTwig3()
-    {
-        $basePath = '/base-path';
-        $uriProphecy = $this->prophesize(UriInterface::class);
-        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath, '3.0');
+        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
         $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
 
         /** @noinspection PhpParamsInspection */
@@ -266,7 +215,7 @@ class TwigMiddlewareTest extends TestCase
         $uriProphecy = $this->prophesize(UriInterface::class);
 
         /** @var Twig $twig */
-        $twig = $this->createTwigProphecy($uriProphecy, '', '2.0')->reveal();
+        $twig = $this->createTwigProphecy($uriProphecy, '')->reveal();
 
         $twigMiddleware = new TwigMiddleware($twig, $routeParser, '', 'view');
 
@@ -315,5 +264,4 @@ class TwigMiddlewareTest extends TestCase
         /** @noinspection PhpParamsInspection */
         $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
     }
-
 }
