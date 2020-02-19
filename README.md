@@ -36,7 +36,7 @@ $container->set('view', function() {
 });
 
 // Create App
-$app = new AppFactory::create();
+$app = AppFactory::create();
 
 // Add Twig-View Middleware
 $app->add(TwigMiddleware::createFromContainer($app));
@@ -74,7 +74,7 @@ use Slim\Views\TwigMiddleware;
 require __DIR__ . '/vendor/autoload.php';
 
 // Create App
-$app = new AppFactory::create();
+$app = AppFactory::create();
 
 // Create Twig
 $twig = Twig::create('path/to/templates', ['cache' => 'path/to/cache']);
