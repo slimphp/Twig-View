@@ -11,7 +11,7 @@ This is a Slim Framework view helper built on top of the Twig templating compone
 Via [Composer](https://getcomposer.org/)
 
 ```bash
-$ composer require slim/twig-view:3.0.0-beta
+$ composer require slim/twig-view:^3.0
 ```
 
 Requires Slim Framework 4 and PHP 7.1 or newer.
