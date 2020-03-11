@@ -103,22 +103,20 @@ class TwigMiddlewareTest extends TestCase
         $this->assertInaccessiblePropertySame($basePath, $middleware, 'basePath');
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The app does not have a container.
-     */
     public function testCreateFromContainerWithoutContainer()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The app does not have a container.');
+
         $app = $this->createMock(App::class);
         TwigMiddleware::createFromContainer($app);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The specified container key does not exist: view
-     */
     public function testCreateFromContainerWithoutContainerKey()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The specified container key does not exist: view');
+
         $container = $this->createMock(ContainerInterface::class);
         $container
             ->method('has')
@@ -131,12 +129,11 @@ class TwigMiddlewareTest extends TestCase
         TwigMiddleware::createFromContainer($app);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Twig instance could not be resolved via container key: view
-     */
     public function testCreateFromContainerWithoutTwig()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Twig instance could not be resolved via container key: view');
+
         $container = $this->createMock(ContainerInterface::class);
         $container
             ->method('has')
