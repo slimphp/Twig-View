@@ -1,7 +1,7 @@
 {
     "name": "slim/twig-view",
     "type": "library",
-    "description": "Slim Framework 4 view helper built on top of the Twig (2 and 3) templating component",
+    "description": "Slim Framework 4 view helper built on top of the Twig 3 templating component",
     "keywords": ["slim","framework","view","template","twig"],
     "homepage": "https://www.slimframework.com",
     "license": "MIT",
