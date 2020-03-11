@@ -50,12 +50,11 @@ class TwigTest extends TestCase
         $this->assertSame($twig, Twig::fromRequest($serverRequest, 'foo'));
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Twig could not be found in the server request attributes using the key "view".
-     */
     public function testFromRequestTwigNotFound()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Twig could not be found in the server request attributes using the key "view".');
+
         $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
         $serverRequestProphecy->getAttribute('view')
             ->willReturn(null);
@@ -65,12 +64,11 @@ class TwigTest extends TestCase
         Twig::fromRequest($serverRequest);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Twig could not be found in the server request attributes using the key "view".
-     */
     public function testFromRequestNotTwig()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Twig could not be found in the server request attributes using the key "view".');
+
         $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
         $serverRequestProphecy->getAttribute('view')
             ->willReturn('twiggy');
