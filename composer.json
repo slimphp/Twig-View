@@ -38,5 +38,15 @@
         "psr-4": {
             "Slim\\Tests\\": "tests"
         }
+    },
+    "scripts": {
+        "test": [
+            "@phpunit",
+            "@phpcs",
+            "@phpstan"
+        ],
+        "phpunit": "phpunit",
+        "phpcs": "phpcs",
+        "phpstan": "phpstan analyse src --memory-limit=-1"
     }
 }
