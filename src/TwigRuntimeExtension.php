@@ -44,9 +44,9 @@ class TwigRuntimeExtension
     /**
      * Get the url for a named route
      *
-     * @param string $routeName   Route name
-     * @param array  $data        Route placeholders
-     * @param array  $queryParams Query parameters
+     * @param string                $routeName   Route name
+     * @param array<string, string> $data        Route placeholders
+     * @param array<string, string> $queryParams Query parameters
      *
      * @return string
      */
@@ -58,9 +58,9 @@ class TwigRuntimeExtension
     /**
      * Get the full url for a named route
      *
-     * @param string $routeName   Route name
-     * @param array  $data        Route placeholders
-     * @param array  $queryParams Query parameters
+     * @param string                $routeName   Route name
+     * @param array<string, string> $data        Route placeholders
+     * @param array<string, string> $queryParams Query parameters
      *
      * @return string
      */
@@ -70,8 +70,8 @@ class TwigRuntimeExtension
     }
 
     /**
-     * @param string $routeName Route name
-     * @param array  $data      Route placeholders
+     * @param string                $routeName Route name
+     * @param array<string, string> $data      Route placeholders
      *
      * @return bool
      */
