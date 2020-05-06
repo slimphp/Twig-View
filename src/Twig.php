@@ -51,7 +51,7 @@ class Twig implements ArrayAccess
     /**
      * Default view variables
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $defaultVariables = [];
 
@@ -74,8 +74,8 @@ class Twig implements ArrayAccess
     }
 
     /**
-     * @param string|array $path     Path(s) to templates directory
-     * @param array        $settings Twig environment settings
+     * @param string|string[]      $path     Path(s) to templates directory
+     * @param array<string, mixed> $settings Twig environment settings
      *
      * @throws LoaderError When the template cannot be found
      *
@@ -98,8 +98,8 @@ class Twig implements ArrayAccess
     }
 
     /**
-     * @param LoaderInterface $loader   Twig loader
-     * @param array           $settings Twig environment settings
+     * @param LoaderInterface      $loader   Twig loader
+     * @param array<string, mixed> $settings Twig environment settings
      */
     public function __construct(LoaderInterface $loader, array $settings = [])
     {
@@ -130,8 +130,8 @@ class Twig implements ArrayAccess
     /**
      * Fetch rendered template
      *
-     * @param  string $template Template pathname relative to templates directory
-     * @param  array  $data     Associative array of template variables
+     * @param  string               $template Template pathname relative to templates directory
+     * @param  array<string, mixed> $data     Associative array of template variables
      *
      * @throws LoaderError  When the template cannot be found
      * @throws SyntaxError  When an error occurred during compilation
@@ -149,9 +149,9 @@ class Twig implements ArrayAccess
     /**
      * Fetch rendered block
      *
-     * @param  string $template Template pathname relative to templates directory
-     * @param  string $block    Name of the block within the template
-     * @param  array  $data     Associative array of template variables
+     * @param  string               $template Template pathname relative to templates directory
+     * @param  string               $block    Name of the block within the template
+     * @param  array<string, mixed> $data     Associative array of template variables
      *
      * @throws Throwable   When an error occurred during rendering
      * @throws LoaderError When the template cannot be found
@@ -169,8 +169,8 @@ class Twig implements ArrayAccess
     /**
      * Fetch rendered string
      *
-     * @param  string $string String
-     * @param  array  $data   Associative array of template variables
+     * @param  string               $string String
+     * @param  array<string, mixed> $data   Associative array of template variables
      *
      * @throws LoaderError When the template cannot be found
      * @throws SyntaxError When an error occurred during compilation
@@ -187,9 +187,9 @@ class Twig implements ArrayAccess
     /**
      * Output rendered template
      *
-     * @param  ResponseInterface $response
-     * @param  string            $template Template pathname relative to templates directory
-     * @param  array             $data Associative array of template variables
+     * @param  ResponseInterface    $response
+     * @param  string               $template Template pathname relative to templates directory
+     * @param  array<string, mixed> $data Associative array of template variables
      *
      * @throws LoaderError  When the template cannot be found
      * @throws SyntaxError  When an error occurred during compilation
@@ -285,7 +285,7 @@ class Twig implements ArrayAccess
     /**
      * Get collection iterator
      *
-     * @return ArrayIterator
+     * @return ArrayIterator<string, mixed>
      */
     public function getIterator(): ArrayIterator
     {
