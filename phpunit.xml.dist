@@ -16,7 +16,7 @@
 >
     <testsuites>
         <testsuite name="Twig-View Test Suite">
-          <directory>./tests/</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
     <logging />
