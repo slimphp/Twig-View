@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use PHPUnit\Framework\TestCase as PhpUnitTestCase;
 use ReflectionProperty;
 
 abstract class TestCase extends PhpUnitTestCase
 {
+    use ProphecyTrait;
+
     protected function assertInaccessiblePropertySame($expected, $obj, string $name)
     {
         $prop = new ReflectionProperty(get_class($obj), $name);

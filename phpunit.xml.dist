@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/8.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          backupGlobals="false"
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="true"
@@ -19,17 +19,13 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <logging />
+    <coverage processUncoveredFiles="true">
+        <include>
             <directory>./src/</directory>
-        </whitelist>
-    </filter>
-    <logging>
-        <log
-            type="coverage-html"
-            target="./coverage"
-            lowUpperBound="20"
-            highLowerBound="50"
-        />
-    </logging>
+        </include>
+        <report>
+            <html outputDirectory="./coverage" lowUpperBound="20" highLowerBound="50"/>
+        </report>
+    </coverage>
 </phpunit>
