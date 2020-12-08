@@ -1,5 +1,4 @@
 language: php
-
 dist: trusty
 
 matrix:
@@ -8,8 +7,8 @@ matrix:
     - php: 7.3
     - php: 7.4
       env: ANALYSIS='true'
-    - php: 8.0
     - php: nightly
+
   allow_failures:
     - php: nightly
 
