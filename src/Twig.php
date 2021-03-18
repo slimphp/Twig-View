@@ -105,6 +105,8 @@ class Twig implements ArrayAccess
     {
         $this->loader = $loader;
         $this->environment = new Environment($this->loader, $settings);
+        $extension = new TwigExtension();
+        $this->addExtension($extension);
     }
 
     /**
