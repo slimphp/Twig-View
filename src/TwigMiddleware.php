@@ -115,9 +115,6 @@ class TwigMiddleware implements MiddlewareInterface
         $runtimeLoader = new TwigRuntimeLoader($this->routeParser, $request->getUri(), $this->basePath);
         $this->twig->addRuntimeLoader($runtimeLoader);
 
-        $extension = new TwigExtension();
-        $this->twig->addExtension($extension);
-
         if ($this->attributeName !== null) {
             $request = $request->withAttribute($this->attributeName, $this->twig);
         }
