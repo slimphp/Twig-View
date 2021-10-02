@@ -21,7 +21,6 @@ use Slim\App;
 use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
-use Slim\Views\TwigExtension;
 use Slim\Views\TwigMiddleware;
 use Slim\Views\TwigRuntimeExtension;
 use Slim\Views\TwigRuntimeLoader;
@@ -41,17 +40,6 @@ class TwigMiddlewareTest extends TestCase
         $self = $this;
 
         $twigProphecy = $this->prophesize(Twig::class);
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $twigProphecy
-            ->addExtension(Argument::type('object'))
-            ->will(function ($args) use ($self) {
-                /** @var TwigExtension $extension */
-                $extension = $args[0];
-
-                $self->assertEquals('slim', $extension->getName());
-            })
-            ->shouldBeCalledOnce();
 
         /** @noinspection PhpUndefinedMethodInspection */
         $twigProphecy->
