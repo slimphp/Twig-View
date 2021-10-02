@@ -14,7 +14,7 @@ Via [Composer](https://getcomposer.org/)
 $ composer require slim/twig-view:^3.0
 ```
 
-Requires Slim Framework 4 and PHP 7.2 or newer.
+Requires Slim Framework 4 and PHP 7.3 or newer.
 
 ## Usage
 
