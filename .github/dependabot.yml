@@ -6,11 +6,3 @@ updates:
     interval: monthly
   open-pull-requests-limit: 10
   versioning-strategy: increase
-  ignore:
-  - dependency-name: phpunit/phpunit
-    versions:
-    - 9.5.1
-    - 9.5.2
-  - dependency-name: phpstan/phpstan
-    versions:
-    - 0.12.70
