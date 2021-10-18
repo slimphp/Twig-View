@@ -14,11 +14,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Slim\Views\Twig;
-use Slim\Views\TwigContext;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\ArrayLoader;
-use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
@@ -98,7 +96,7 @@ class TwigTest extends TestCase
 
         // Mock a runtime loader.
         $runtimeLoader = $this->getMockBuilder(RuntimeLoaderInterface::class)
-            ->setMethods(['load'])
+            ->onlyMethods(['load'])
             ->getMock();
 
         // The method `load` should be called once and should return the mocked runtime extension.
@@ -267,11 +265,15 @@ EOF
         $this->assertEquals("<p>Hi, my name is Peter and I am male.</p>\n", $multiDirectory);
     }
 
-    public function testRender()
+    /**
+     * The auxiliary method for the testRender...() methods
+     */
+    private function getViewAndMocksForRender(): array
     {
         $loader = new ArrayLoader([
             'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
         ]);
+
         $view = new Twig($loader);
 
         $mockBody = $this->getMockBuilder('Psr\Http\Message\StreamInterface')
@@ -291,10 +293,57 @@ EOF
             ->method('getBody')
             ->willReturn($mockBody);
 
-        $response = $view->render($mockResponse, 'example.html', [
-            'name' => 'Josh'
-        ]);
+        $mockResponseFactory = $this->getMockBuilder('Psr\Http\Message\ResponseFactoryInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return [$view, $mockResponse, $mockResponseFactory];
+    }
+
+    public function testRenderWithoutResponseFactory()
+    {
+        [$view, $mockResponse] = $this->getViewAndMocksForRender();
+
+        $response = $view->render($mockResponse, 'example.html', ['name' => 'Josh']);
         $this->assertInstanceOf(ResponseInterface::class, $response);
+    }
+
+    public function testRenderWithResponseFactory()
+    {
+        [$view, $mockResponse, $mockResponseFactory] = $this->getViewAndMocksForRender();
+
+        $mockResponseFactory->expects($this->once())
+            ->method('createResponse')
+            ->willReturn($mockResponse);
+
+        $view->setResponseFactory($mockResponseFactory);
+
+        $response = $view->render('example.html', ['name' => 'Josh']);
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+    }
+
+    public function testInvalidArgumentInRender()
+    {
+        $loader = new ArrayLoader([
+            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
+        ]);
+        $view = new Twig($loader);
+
+        $this->expectExceptionMessage('Invalid arguments were passed to the Slim\Views\Twig::render method');
+
+        $view->render('example.html', 'example.html');
+    }
+
+    public function testNotDefinedResponseFactoryInRender()
+    {
+        $loader = new ArrayLoader([
+            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
+        ]);
+        $view = new Twig($loader);
+
+        $this->expectExceptionMessage('Response factory is not defined');
+
+        $view->render('example.html', ['name' => 'Josh']);
     }
 
     public function testGetLoader()

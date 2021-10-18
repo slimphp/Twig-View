@@ -11,6 +11,8 @@ namespace Slim\Views;
 
 use ArrayAccess;
 use ArrayIterator;
+use InvalidArgumentException;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -54,6 +56,13 @@ class Twig implements ArrayAccess
      * @var array<string, mixed>
      */
     protected $defaultVariables = [];
+
+    /**
+     * PSR-17 response factory
+     *
+     * @var ResponseFactoryInterface
+     */
+    protected $responseFactory;
 
     /**
      * @param ServerRequestInterface $request
@@ -130,6 +139,14 @@ class Twig implements ArrayAccess
     }
 
     /**
+     * @param ResponseFactoryInterface $responseFactory
+     */
+    public function setResponseFactory(ResponseFactoryInterface $responseFactory): void
+    {
+        $this->responseFactory = $responseFactory;
+    }
+
+    /**
      * Fetch rendered template
      *
      * @param  string               $template Template pathname relative to templates directory
@@ -189,9 +206,9 @@ class Twig implements ArrayAccess
     /**
      * Output rendered template
      *
-     * @param  ResponseInterface    $response
-     * @param  string               $template Template pathname relative to templates directory
-     * @param  array<string, mixed> $data Associative array of template variables
+     * @param  ResponseInterface|string    $responseOrTemplate Response or template pathname relative to templates dir.
+     * @param  string|array<string, mixed> $templateOrData     Template pathname or template variables
+     * @param  array<string, mixed>        $data               Associative array of template variables
      *
      * @throws LoaderError  When the template cannot be found
      * @throws SyntaxError  When an error occurred during compilation
@@ -199,11 +216,27 @@ class Twig implements ArrayAccess
      *
      * @return ResponseInterface
      */
-    public function render(ResponseInterface $response, string $template, array $data = []): ResponseInterface
+    public function render($responseOrTemplate, $templateOrData = [], array $data = []): ResponseInterface
     {
-        $response->getBody()->write($this->fetch($template, $data));
+        if ($responseOrTemplate instanceof ResponseInterface && is_string($templateOrData)) {
+            $responseOrTemplate->getBody()->write($this->fetch($templateOrData, $data));
 
-        return $response;
+            return $responseOrTemplate;
+        } elseif (is_string($responseOrTemplate) && is_array($templateOrData)) {
+            if (!isset($this->responseFactory)) {
+                throw new RuntimeException('Response factory is not defined');
+            }
+
+            $response = $this->responseFactory->createResponse();
+            $response->getBody()->write($this->fetch($responseOrTemplate, $templateOrData));
+
+            return $response;
+        } else {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid arguments were passed to the %s method',
+                __METHOD__
+            ));
+        }
     }
 
     /**

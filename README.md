@@ -106,6 +106,18 @@ $app->get('/hi/{name}', function ($request, $response, $args) {
 // Run app
 $app->run();
 ```
+## Two ways to use the render() method
+
+The first:
+```php
+$view->render($response, 'example.html', ['name' => 'Josh'])
+````
+The second requires you to set any implementation of the PSR-17 response factory otherwise an exception will be thrown:
+```php
+$view->setResponseFactory($someResponseFactory);
+
+$view->render('example.html', ['name' => 'Josh'])
+```
 
 ## Custom template functions
 
