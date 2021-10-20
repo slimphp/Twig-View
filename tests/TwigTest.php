@@ -97,7 +97,7 @@ class TwigTest extends TestCase
 
         // Mock a runtime loader.
         $runtimeLoader = $this->getMockBuilder(RuntimeLoaderInterface::class)
-            ->setMethods(['load'])
+            ->onlyMethods(['load'])
             ->getMock();
 
         // The method `load` should be called once and should return the mocked runtime extension.
