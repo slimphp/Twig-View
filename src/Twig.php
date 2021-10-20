@@ -25,6 +25,12 @@ use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
+use function array_key_exists;
+use function array_merge;
+use function count;
+use function is_array;
+use function is_string;
+
 /**
  * Twig View
  *
@@ -67,7 +73,7 @@ class Twig implements ArrayAccess
     public static function fromRequest(ServerRequestInterface $request, string $attributeName = 'view'): self
     {
         $twig = $request->getAttribute($attributeName);
-        if ($twig === null || !($twig instanceof self)) {
+        if (!($twig instanceof self)) {
             throw new RuntimeException(
                 'Twig could not be found in the server request attributes using the key "' . $attributeName . '".'
             );

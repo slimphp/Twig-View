@@ -14,6 +14,8 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use PHPUnit\Framework\TestCase as PhpUnitTestCase;
 use ReflectionProperty;
 
+use function get_class;
+
 abstract class TestCase extends PhpUnitTestCase
 {
     use ProphecyTrait;

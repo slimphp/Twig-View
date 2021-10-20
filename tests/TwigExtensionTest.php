@@ -12,6 +12,8 @@ namespace Slim\Tests;
 
 use Slim\Views\TwigExtension;
 
+use function count;
+
 class TwigExtensionTest extends TestCase
 {
     public function testGetName()

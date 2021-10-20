@@ -105,7 +105,6 @@ class TwigTest extends TestCase
             ->method('load')
             ->willReturn($runtimeExtension);
 
-        /** @noinspection PhpParamsInspection */
         $view->addRuntimeLoader($runtimeLoader);
 
         $this->assertSame($runtimeExtension, $view->getEnvironment()->getRuntime(get_class($runtimeLoader)));
