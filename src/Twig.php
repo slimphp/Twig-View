@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Slim Framework (http://slimframework.com)
  *
@@ -31,6 +32,8 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
  * Twig is a PHP component created by Fabien Potencier.
  *
  * @link https://twig.symfony.com/
+ *
+ * @implements ArrayAccess<string, mixed>
  */
 class Twig implements ArrayAccess
 {
@@ -66,7 +69,7 @@ class Twig implements ArrayAccess
         $twig = $request->getAttribute($attributeName);
         if ($twig === null || !($twig instanceof self)) {
             throw new RuntimeException(
-                'Twig could not be found in the server request attributes using the key "'. $attributeName .'".'
+                'Twig could not be found in the server request attributes using the key "' . $attributeName . '".'
             );
         }
 

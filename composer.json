@@ -24,7 +24,7 @@
         "twig/twig": "^3.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.3.8",
+        "phpunit/phpunit": "^9.5",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/phpstan": "^0.12.99",
         "psr/http-factory": "^1.0",
@@ -48,6 +48,6 @@
         ],
         "phpunit": "phpunit",
         "phpcs": "phpcs",
-        "phpstan": "phpstan analyse src --memory-limit=-1"
+        "phpstan": "phpstan"
     }
 }
