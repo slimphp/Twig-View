@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Slim Framework (http://slimframework.com)
  *
@@ -14,11 +15,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Slim\Views\Twig;
-use Slim\Views\TwigContext;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\ArrayLoader;
-use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
@@ -98,7 +97,7 @@ class TwigTest extends TestCase
 
         // Mock a runtime loader.
         $runtimeLoader = $this->getMockBuilder(RuntimeLoaderInterface::class)
-            ->setMethods(['load'])
+            ->onlyMethods(['load'])
             ->getMock();
 
         // The method `load` should be called once and should return the mocked runtime extension.
@@ -106,7 +105,6 @@ class TwigTest extends TestCase
             ->method('load')
             ->willReturn($runtimeExtension);
 
-        /** @noinspection PhpParamsInspection */
         $view->addRuntimeLoader($runtimeLoader);
 
         $this->assertSame($runtimeExtension, $view->getEnvironment()->getRuntime(get_class($runtimeLoader)));
@@ -167,9 +165,9 @@ EOF
         $view = Twig::create(
             [
                 'namespace' => [
-                    __DIR__.'/another',
-                    __DIR__.'/templates',
-                    __DIR__.'/multi',
+                    __DIR__ . '/another',
+                    __DIR__ . '/templates',
+                    __DIR__ . '/multi',
                 ],
             ]
         );
@@ -196,7 +194,7 @@ EOF
     {
         $views = Twig::create([
             'One' => [
-                __DIR__.'/templates',
+                __DIR__ . '/templates',
             ],
         ]);
 
@@ -210,7 +208,7 @@ EOF
     public function testASingleTemplateWithANamespace()
     {
         $views = Twig::create([
-            'One' => __DIR__.'/templates',
+            'One' => __DIR__ . '/templates',
         ]);
 
         $output = $views->fetch('@One/example.html', [
@@ -225,10 +223,10 @@ EOF
         $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
 
         $views = Twig::create([
-            'One'   => __DIR__.'/templates',
-            'Two'   => __DIR__.'/another',
+            'One'   => __DIR__ . '/templates',
+            'Two'   => __DIR__ . '/another',
             'Three' => [
-                __DIR__.'/multi',
+                __DIR__ . '/multi',
             ],
         ]);
 
@@ -253,7 +251,7 @@ EOF
     public function testMultipleDirectoriesWithoutNamespaces()
     {
         $weekday = (new DateTimeImmutable('2016-03-08'))->format('l');
-        $view    = Twig::create([__DIR__.'/multi/', __DIR__.'/another/']);
+        $view    = Twig::create([__DIR__ . '/multi/', __DIR__ . '/another/']);
 
         $rootDirectory = $view->fetch('directory/template/example.html', [
             'weekday' => $weekday,

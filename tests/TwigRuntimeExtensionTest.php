@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Slim Framework (http://slimframework.com)
  *
@@ -94,7 +95,6 @@ class TwigRuntimeExtensionTest extends TestCase
 
         $uriProphecy = $this->prophesize(UriInterface::class);
 
-        /** @noinspection PhpUndefinedMethodInspection */
         $uriProphecy
             ->getPath()
             ->willReturn($path)
@@ -140,13 +140,11 @@ class TwigRuntimeExtensionTest extends TestCase
         $path = parse_url($url, PHP_URL_PATH);
         $query = parse_url($url, PHP_URL_QUERY);
 
-        /** @noinspection PhpUndefinedMethodInspection */
         $uriProphecy
             ->getPath()
             ->willReturn($path)
             ->shouldBeCalledOnce();
 
-        /** @noinspection PhpUndefinedMethodInspection */
         $uriProphecy
             ->getQuery()
             ->willReturn($query)
@@ -245,12 +243,10 @@ class TwigRuntimeExtensionTest extends TestCase
 
         $uriProphecy = $this->prophesize(UriInterface::class);
 
-        /** @noinspection PhpUndefinedMethodInspection */
         $uriProphecy->getScheme()
             ->willReturn('http')
             ->shouldBeCalledOnce();
 
-        /** @noinspection PhpUndefinedMethodInspection */
         $uriProphecy->getAuthority()
             ->willReturn('localhost')
             ->shouldBeCalledOnce();

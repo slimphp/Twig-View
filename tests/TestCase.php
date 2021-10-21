@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Slim Framework (http://slimframework.com)
  *
@@ -12,6 +13,8 @@ namespace Slim\Tests;
 use Prophecy\PhpUnit\ProphecyTrait;
 use PHPUnit\Framework\TestCase as PhpUnitTestCase;
 use ReflectionProperty;
+
+use function get_class;
 
 abstract class TestCase extends PhpUnitTestCase
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Slim Framework (http://slimframework.com)
  *
@@ -10,6 +11,8 @@ declare(strict_types=1);
 namespace Slim\Tests;
 
 use Slim\Views\TwigExtension;
+
+use function count;
 
 class TwigExtensionTest extends TestCase
 {
