@@ -46,24 +46,20 @@ class Twig implements ArrayAccess
 {
     /**
      * Twig loader
-     *
-     * @var LoaderInterface
      */
-    protected $loader;
+    protected LoaderInterface $loader;
 
     /**
      * Twig environment
-     *
-     * @var Environment
      */
-    protected $environment;
+    protected Environment $environment;
 
     /**
      * Default view variables
      *
      * @var array<string, mixed>
      */
-    protected $defaultVariables = [];
+    protected array $defaultVariables = [];
 
     /**
      * @param ServerRequestInterface $request

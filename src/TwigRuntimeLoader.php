@@ -16,20 +16,11 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TwigRuntimeLoader implements RuntimeLoaderInterface
 {
-    /**
-     * @var RouteParserInterface
-     */
-    protected $routeParser;
+    protected RouteParserInterface $routeParser;
 
-    /**
-     * @var UriInterface
-     */
-    protected $uri;
+    protected UriInterface $uri;
 
-    /**
-     * @var string
-     */
-    protected $basePath = '';
+    protected string $basePath = '';
 
     /**
      * TwigRuntimeLoader constructor.

@@ -20,25 +20,13 @@ use Slim\Interfaces\RouteParserInterface;
 
 class TwigMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var Twig
-     */
-    protected $twig;
+    protected Twig $twig;
 
-    /**
-     * @var RouteParserInterface
-     */
-    protected $routeParser;
+    protected RouteParserInterface $routeParser;
 
-    /**
-     * @var string
-     */
-    protected $basePath;
+    protected string $basePath;
 
-    /**
-     * @var string|null
-     */
-    protected $attributeName;
+    protected ?string $attributeName;
 
     /**
      * @param App    $app
