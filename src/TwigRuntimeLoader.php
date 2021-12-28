@@ -37,7 +37,11 @@ class TwigRuntimeLoader implements RuntimeLoaderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Create the runtime implementation of a Twig element.
+     *
+     * @param string $class
+     *
+     * @return mixed
      */
     public function load(string $class)
     {
