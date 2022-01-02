@@ -66,7 +66,7 @@ class TwigRuntimeExtensionTest extends TestCase
         return $route;
     }
 
-    public function isCurrentUrlProvider()
+    public function isCurrentUrlProvider(): array
     {
         return [
             ['/hello/{name}', ['name' => 'world'], '/hello/world', '/base-path', true],
@@ -109,7 +109,7 @@ class TwigRuntimeExtensionTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function currentUrlProvider()
+    public function currentUrlProvider(): array
     {
         return [
             ['/hello/{name}', 'http://example.com/hello/world?a=b', '', true],
@@ -164,7 +164,7 @@ class TwigRuntimeExtensionTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function urlForProvider()
+    public function urlForProvider(): array
     {
         return [
             ['/hello/{name}', ['name' => 'world'], [], '', '/hello/world'],
@@ -204,7 +204,7 @@ class TwigRuntimeExtensionTest extends TestCase
         $this->assertEquals($expectedUrl, $extension->urlFor($routeName, $routeData, $queryParams));
     }
 
-    public function fullUrlForProvider()
+    public function fullUrlForProvider(): array
     {
         return [
             ['/hello/{name}', ['name' => 'world'], [], '', 'http://localhost/hello/world'],

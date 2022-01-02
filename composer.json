@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^7.4 || ^8.0",
         "psr/http-message": "^1.0",
         "slim/slim": "^4.9",
         "twig/twig": "^3.3",

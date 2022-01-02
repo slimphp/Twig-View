@@ -15,20 +15,11 @@ use Slim\Interfaces\RouteParserInterface;
 
 class TwigRuntimeExtension
 {
-    /**
-     * @var RouteParserInterface
-     */
-    protected $routeParser;
+    protected RouteParserInterface $routeParser;
 
-    /**
-     * @var string
-     */
-    protected $basePath = '';
+    protected string $basePath = '';
 
-    /**
-     * @var UriInterface
-     */
-    protected $uri;
+    protected UriInterface $uri;
 
     /**
      * @param RouteParserInterface $routeParser Route parser
