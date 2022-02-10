@@ -1,7 +1,0 @@
-.*.swp
-.idea
-.phpunit.result.cache
-composer.lock
-clover.xml
-coverage
-vendor
