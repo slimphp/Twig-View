@@ -32,7 +32,7 @@ class TwigMiddleware implements MiddlewareInterface
      * @param App    $app
      * @param string $containerKey
      *
-     * @return TwigMiddleware
+     * @return static
      */
     public static function createFromContainer(App $app, string $containerKey = 'view'): self
     {
@@ -53,7 +53,7 @@ class TwigMiddleware implements MiddlewareInterface
             );
         }
 
-        return new self(
+        return new static(
             $twig,
             $app->getRouteCollector()->getRouteParser(),
             $app->getBasePath()
@@ -65,11 +65,11 @@ class TwigMiddleware implements MiddlewareInterface
      * @param Twig   $twig
      * @param string $attributeName
      *
-     * @return TwigMiddleware
+     * @return static
      */
     public static function create(App $app, Twig $twig, string $attributeName = 'view'): self
     {
-        return new self(
+        return new static(
             $twig,
             $app->getRouteCollector()->getRouteParser(),
             $app->getBasePath(),
