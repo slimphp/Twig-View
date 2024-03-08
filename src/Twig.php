@@ -85,7 +85,7 @@ class Twig implements ArrayAccess
      *
      * @throws LoaderError When the template cannot be found
      *
-     * @return Twig
+     * @return static
      */
     public static function create($path, array $settings = []): self
     {
@@ -100,7 +100,7 @@ class Twig implements ArrayAccess
             }
         }
 
-        return new self($loader, $settings);
+        return new static($loader, $settings);
     }
 
     /**
