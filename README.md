@@ -11,12 +11,14 @@ This is a Slim Framework view helper built on top of the Twig templating compone
 Via [Composer](https://getcomposer.org/)
 
 ```bash
-$ composer require slim/twig-view
+composer require slim/twig-view
 ```
 
 Requires Slim Framework 4, Twig 3 and PHP 7.4 or newer.
 
 ## Usage
+
+### With DI Container
 
 ```php
 use DI\Container;
@@ -24,39 +26,47 @@ use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Create Container
 $container = new Container();
-AppFactory::setContainer($container);
 
 // Set view in Container
-$container->set('view', function() {
-    return Twig::create('path/to/templates', ['cache' => 'path/to/cache']);
+$container->set(Twig::class, function() {
+    return Twig::create(__DIR__ . '/../templates', ['cache' => 'path/to/cache']);
 });
 
-// Create App
-$app = AppFactory::create();
+// Create App from container
+$app = AppFactory::createFromContainer($container);
 
 // Add Twig-View Middleware
-$app->add(TwigMiddleware::createFromContainer($app));
+$app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 
-// Define named route
+// Add other middleware
+$app->addRoutingMiddleware();
+$app->addErrorMiddleware(true, true, true);
+
+// Render from template file templates/profile.html.twig
 $app->get('/hello/{name}', function ($request, $response, $args) {
-    return $this->get('view')->render($response, 'profile.html', [
-        'name' => $args['name']
-    ]);
+    $viewData = [
+        'name' => $args['name'],
+    ];
+
+    $twig = $this->get(Twig::class);
+
+    return $twig->render($response, 'profile.html.twig', $viewData);
 })->setName('profile');
 
 // Render from string
 $app->get('/hi/{name}', function ($request, $response, $args) {
-    $str = $this->get('view')->fetchFromString(
-        '<p>Hi, my name is {{ name }}.</p>',
-        [
-            'name' => $args['name']
-        ]
-    );
+    $viewData = [
+        'name' => $args['name'],
+    ];
+
+    $twig = $this->get(Twig::class);
+    $str = $twig->fetchFromString('<p>Hi, my name is {{ name }}.</p>', $viewData);
     $response->getBody()->write($str);
+
     return $response;
 });
 
@@ -64,14 +74,14 @@ $app->get('/hi/{name}', function ($request, $response, $args) {
 $app->run();
 ```
 
-### Without container
+### Without DI container
 
 ```php
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Create App
 $app = AppFactory::create();
@@ -85,7 +95,7 @@ $app->add(TwigMiddleware::create($app, $twig));
 // Define named route
 $app->get('/hello/{name}', function ($request, $response, $args) {
     $view = Twig::fromRequest($request);
-    return $view->render($response, 'profile.html', [
+    return $view->render($response, 'profile.html.twig', [
         'name' => $args['name']
     ]);
 })->setName('profile');
@@ -100,6 +110,7 @@ $app->get('/hi/{name}', function ($request, $response, $args) {
         ]
     );
     $response->getBody()->write($str);
+
     return $response;
 });
 
@@ -112,7 +123,7 @@ $app->run();
 `TwigExtension` provides these functions to your Twig templates:
 
 * `url_for()` - returns the URL for a given route. e.g.: /hello/world
-* `full_url_for()` - returns the URL for a given route. e.g.: http://www.example.com/hello/world
+* `full_url_for()` - returns the URL for a given route. e.g.: https://www.example.com/hello/world
 * `is_current_url()` - returns true is the provided route name and parameters are valid for the current path.
 * `current_url()` - returns the current path, with or without the query string.
 * `get_uri()` - returns the `UriInterface` object from the incoming `ServerRequestInterface` object
@@ -120,16 +131,12 @@ $app->run();
 
 You can use `url_for` to generate complete URLs to any Slim application named route and use `is_current_url` to determine if you need to mark a link as active as shown in this example Twig template:
 
-```php
-{% extends "layout.html" %}
-
-{% block body %}
+```html
 <h1>User List</h1>
 <ul>
     <li><a href="{{ url_for('profile', { 'name': 'josh' }) }}" {% if is_current_url('profile', { 'name': 'josh' }) %}class="active"{% endif %}>Josh</a></li>
     <li><a href="{{ url_for('profile', { 'name': 'andrew' }) }}">Andrew</a></li>
 </ul>
-{% endblock %}
 ```
 
 ## Tests
