@@ -1,8 +1,10 @@
 # Slim Framework Twig View
 
-[![Build Status](https://travis-ci.org/slimphp/Twig-View.svg?branch=master)](https://travis-ci.org/slimphp/Twig-View)
+[![Latest Version on Packagist](https://img.shields.io/github/release/slimphp/twig-view.svg)](https://packagist.org/packages/slim/Twig-View)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
+[![Build Status](https://github.com/slimphp/Twig-View/actions/workflows/tests.yml/badge.svg?branch=3.x)](https://github.com/slimphp/Twig-View/actions)
 [![Coverage Status](https://coveralls.io/repos/github/slimphp/Twig-View/badge.svg?branch=3.x)](https://coveralls.io/github/slimphp/Twig-View?branch=3.x)
-[![License](https://poser.pugx.org/slim/twig-view/license)](https://packagist.org/packages/slim/twig-view)
+[![Total Downloads](https://img.shields.io/packagist/dt/slim/Twig-View.svg)](https://packagist.org/packages/slim/Twig-View/stats)
 
 This is a Slim Framework view helper built on top of the Twig templating component. You can use this component to create and render templates in your Slim Framework application.
 
@@ -11,7 +13,7 @@ This is a Slim Framework view helper built on top of the Twig templating compone
 Via [Composer](https://getcomposer.org/)
 
 ```bash
-$ composer require slim/twig-view
+composer require slim/twig-view
 ```
 
 Requires Slim Framework 4, Twig 3 and PHP 7.4 or newer.
