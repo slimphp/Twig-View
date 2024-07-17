@@ -1,7 +1,8 @@
 .*.swp
-.idea
+/.idea
 .phpunit.result.cache
 composer.lock
 clover.xml
-coverage
-vendor
+/coverage
+/vendor
+/build
