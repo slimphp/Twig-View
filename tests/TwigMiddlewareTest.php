@@ -33,7 +33,7 @@ class TwigMiddlewareTest extends TestCase
      * Create a twig prophecy given a uri prophecy and a base path.
      *
      * @param ObjectProphecy $uriProphecy
-     * @param string         $basePath
+     * @param string $basePath
      *
      * @return ObjectProphecy&Twig
      */
