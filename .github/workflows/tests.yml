@@ -29,14 +29,14 @@ jobs:
 
       - name: Coding standards
         if: matrix.analysis
-        run: vendor/bin/phpcs
+        run: composer sniffer:check
 
       - name: Static analysis
         if: matrix.analysis
-        run: vendor/bin/phpstan
+        run: composer stan
 
       - name: Tests
-        run: vendor/bin/phpunit --coverage-clover clover.xml
+        run: composer test:coverage
 
       - name: Upload coverage results to Coveralls
         if: matrix.analysis
@@ -44,4 +44,4 @@ jobs:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           composer require php-coveralls/php-coveralls -n -W
-          vendor/bin/php-coveralls --coverage_clover=clover.xml -v
+          vendor/bin/php-coveralls --coverage_clover=build/coverage/clover.xml -v
