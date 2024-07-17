@@ -10,12 +10,14 @@ declare(strict_types=1);
 
 namespace Slim\Views;
 
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 use Slim\App;
+use Slim\Interfaces\RouteCollectorProxyInterface;
 use Slim\Interfaces\RouteParserInterface;
 
 class TwigMiddleware implements MiddlewareInterface
@@ -29,7 +31,7 @@ class TwigMiddleware implements MiddlewareInterface
     protected ?string $attributeName;
 
     /**
-     * @param App    $app
+     * @param App $app
      * @param string $containerKey
      *
      * @return TwigMiddleware
@@ -61,8 +63,8 @@ class TwigMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @param App    $app
-     * @param Twig   $twig
+     * @param App $app
+     * @param Twig $twig
      * @param string $attributeName
      *
      * @return TwigMiddleware
@@ -78,10 +80,10 @@ class TwigMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @param Twig                 $twig
+     * @param Twig $twig
      * @param RouteParserInterface $routeParser
-     * @param string               $basePath
-     * @param string|null          $attributeName
+     * @param string $basePath
+     * @param string|null $attributeName
      */
     public function __construct(
         Twig $twig,
@@ -98,7 +100,7 @@ class TwigMiddleware implements MiddlewareInterface
     /**
      * Process an incoming server request.
      *
-     * @param ServerRequestInterface  $request
+     * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface

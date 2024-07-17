@@ -1,7 +1,18 @@
-.*.swp
-.idea
-.phpunit.result.cache
+# Composer
 composer.lock
+/vendor
+
+# PHPUnit
+/.phpunit.cache
+.phpunit.result.cache
+
+# IDEs
+/.fleet
+/.idea
+/.vscode
+
+# Build artifacts and temporary files
+.DS_Store
 clover.xml
-coverage
-vendor
+/build
+/coverage

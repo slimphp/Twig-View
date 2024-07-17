@@ -63,7 +63,7 @@ class Twig implements ArrayAccess
 
     /**
      * @param ServerRequestInterface $request
-     * @param string                 $attributeName
+     * @param string $attributeName
      *
      * @return Twig
      */
@@ -80,7 +80,7 @@ class Twig implements ArrayAccess
     }
 
     /**
-     * @param string|string[]      $path     Path(s) to templates directory
+     * @param string|string[] $path Path(s) to templates directory
      * @param array<string, mixed> $settings Twig environment settings
      *
      * @throws LoaderError When the template cannot be found
@@ -104,7 +104,7 @@ class Twig implements ArrayAccess
     }
 
     /**
-     * @param LoaderInterface      $loader   Twig loader
+     * @param LoaderInterface $loader Twig loader
      * @param array<string, mixed> $settings Twig environment settings
      */
     public function __construct(LoaderInterface $loader, array $settings = [])
@@ -138,8 +138,8 @@ class Twig implements ArrayAccess
     /**
      * Fetch rendered template
      *
-     * @param  string               $template Template pathname relative to templates directory
-     * @param  array<string, mixed> $data     Associative array of template variables
+     * @param string $template Template pathname relative to templates directory
+     * @param array<string, mixed> $data Associative array of template variables
      *
      * @throws LoaderError  When the template cannot be found
      * @throws SyntaxError  When an error occurred during compilation
@@ -157,9 +157,9 @@ class Twig implements ArrayAccess
     /**
      * Fetch rendered block
      *
-     * @param  string               $template Template pathname relative to templates directory
-     * @param  string               $block    Name of the block within the template
-     * @param  array<string, mixed> $data     Associative array of template variables
+     * @param string $template Template pathname relative to templates directory
+     * @param string $block Name of the block within the template
+     * @param array<string, mixed> $data Associative array of template variables
      *
      * @throws Throwable   When an error occurred during rendering
      * @throws LoaderError When the template cannot be found
@@ -177,8 +177,8 @@ class Twig implements ArrayAccess
     /**
      * Fetch rendered string
      *
-     * @param  string               $string String
-     * @param  array<string, mixed> $data   Associative array of template variables
+     * @param string $string String
+     * @param array<string, mixed> $data Associative array of template variables
      *
      * @throws LoaderError When the template cannot be found
      * @throws SyntaxError When an error occurred during compilation
@@ -195,9 +195,9 @@ class Twig implements ArrayAccess
     /**
      * Output rendered template
      *
-     * @param  ResponseInterface    $response
-     * @param  string               $template Template pathname relative to templates directory
-     * @param  array<string, mixed> $data Associative array of template variables
+     * @param ResponseInterface $response
+     * @param string $template Template pathname relative to templates directory
+     * @param array<string, mixed> $data Associative array of template variables
      *
      * @throws LoaderError  When the template cannot be found
      * @throws SyntaxError  When an error occurred during compilation
@@ -235,7 +235,7 @@ class Twig implements ArrayAccess
     /**
      * Does this collection have a given key?
      *
-     * @param  string $key The data key
+     * @param string $key The data key
      *
      * @return bool
      */
@@ -263,8 +263,8 @@ class Twig implements ArrayAccess
     /**
      * Set collection item
      *
-     * @param string $key   The data key
-     * @param mixed  $value The data value
+     * @param string $key The data key
+     * @param mixed $value The data value
      */
     public function offsetSet($key, $value): void
     {

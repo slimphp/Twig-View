@@ -23,8 +23,8 @@ class TwigRuntimeExtension
 
     /**
      * @param RouteParserInterface $routeParser Route parser
-     * @param UriInterface         $uri         Uri
-     * @param string               $basePath    Base path
+     * @param UriInterface $uri Uri
+     * @param string $basePath Base path
      */
     public function __construct(RouteParserInterface $routeParser, UriInterface $uri, string $basePath = '')
     {
@@ -36,8 +36,8 @@ class TwigRuntimeExtension
     /**
      * Get the url for a named route
      *
-     * @param string                $routeName   Route name
-     * @param array<string, string> $data        Route placeholders
+     * @param string $routeName Route name
+     * @param array<string, string> $data Route placeholders
      * @param array<string, string> $queryParams Query parameters
      *
      * @return string
@@ -50,8 +50,8 @@ class TwigRuntimeExtension
     /**
      * Get the full url for a named route
      *
-     * @param string                $routeName   Route name
-     * @param array<string, string> $data        Route placeholders
+     * @param string $routeName Route name
+     * @param array<string, string> $data Route placeholders
      * @param array<string, string> $queryParams Query parameters
      *
      * @return string
@@ -62,8 +62,8 @@ class TwigRuntimeExtension
     }
 
     /**
-     * @param string                $routeName Route name
-     * @param array<string, string> $data      Route placeholders
+     * @param string $routeName Route name
+     * @param array<string, string> $data Route placeholders
      *
      * @return bool
      */

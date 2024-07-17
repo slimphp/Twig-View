@@ -26,8 +26,8 @@ class TwigRuntimeLoader implements RuntimeLoaderInterface
      * TwigRuntimeLoader constructor.
      *
      * @param RouteParserInterface $routeParser
-     * @param UriInterface         $uri
-     * @param string               $basePath
+     * @param UriInterface $uri
+     * @param string $basePath
      */
     public function __construct(RouteParserInterface $routeParser, UriInterface $uri, string $basePath = '')
     {
