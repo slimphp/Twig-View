@@ -195,7 +195,9 @@ class Twig implements ArrayAccess
     /**
      * Output rendered template
      *
-     * @param ResponseInterface $response
+     * @template TResponse of ResponseInterface
+     *
+     * @param TResponse $response
      * @param string $template Template pathname relative to templates directory
      * @param array<string, mixed> $data Associative array of template variables
      *
@@ -203,7 +205,7 @@ class Twig implements ArrayAccess
      * @throws SyntaxError  When an error occurred during compilation
      * @throws RuntimeError When an error occurred during rendering
      *
-     * @return ResponseInterface
+     * @return TResponse
      */
     public function render(ResponseInterface $response, string $template, array $data = []): ResponseInterface
     {
