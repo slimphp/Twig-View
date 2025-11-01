@@ -23,7 +23,9 @@ abstract class TestCase extends PhpUnitTestCase
     protected function assertInaccessiblePropertySame($expected, $obj, string $name)
     {
         $prop = new ReflectionProperty(get_class($obj), $name);
-        $prop->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $prop->setAccessible(true);
+        }
         $this->assertSame($expected, $prop->getValue($obj));
     }
 }
