@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,35 +28,34 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 class TwigMiddlewareTest extends TestCase
 {
     /**
-     * Create a twig prophecy given a uri prophecy and a base path.
+     * Create a twig mock given a uri mock and a base path.
      *
-     * @param ObjectProphecy $uriProphecy
+     * @param UriInterface $uri
      * @param string $basePath
      *
-     * @return ObjectProphecy&Twig
+     * @return Twig
      */
-    private function createTwigProphecy(ObjectProphecy $uriProphecy, string $basePath)
+    private function createTwigMock(UriInterface $uri, string $basePath)
     {
         $self = $this;
 
-        $twigProphecy = $this->prophesize(Twig::class);
+        $twigMock = $this->createMock(Twig::class);
 
-        $twigProphecy
-            ->addRuntimeLoader(Argument::type(RuntimeLoaderInterface::class))
-            ->will(function ($args) use ($self, $uriProphecy, $basePath) {
+        $twigMock->expects($this->once())
+            ->method('addRuntimeLoader')
+            ->with($this->isInstanceOf(RuntimeLoaderInterface::class))
+            ->willReturnCallback(function ($runtimeLoader) use ($self, $uri, $basePath) {
                 /** @var TwigRuntimeLoader $runtimeLoader */
-                $runtimeLoader = $args[0];
                 $runtimeExtension = $runtimeLoader->load(TwigRuntimeExtension::class);
 
                 $self->assertInstanceOf(TwigRuntimeExtension::class, $runtimeExtension);
 
                 /** @var TwigRuntimeExtension $runtimeExtension */
-                $self->assertSame($uriProphecy->reveal(), $runtimeExtension->getUri());
+                $self->assertSame($uri, $runtimeExtension->getUri());
                 $self->assertSame($basePath, $runtimeExtension->getBasePath());
-            })
-            ->shouldBeCalledOnce();
+            });
 
-        return $twigProphecy;
+        return $twigMock;
     }
 
     public function testCreateFromContainer()
@@ -164,79 +161,78 @@ class TwigMiddlewareTest extends TestCase
     public function testProcess()
     {
         $basePath = '/base-path';
-        $uriProphecy = $this->prophesize(UriInterface::class);
-        $twigProphecy = $this->createTwigProphecy($uriProphecy, $basePath);
-        $routeParserProphecy = $this->prophesize(RouteParserInterface::class);
+        $uri = $this->createMock(UriInterface::class);
+        $twig = $this->createTwigMock($uri, $basePath);
+        $routeParser = $this->createMock(RouteParserInterface::class);
 
         $twigMiddleware = new TwigMiddleware(
-            $twigProphecy->reveal(),
-            $routeParserProphecy->reveal(),
+            $twig,
+            $routeParser,
             $basePath
         );
 
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
-        $requestProphecy
-            ->getUri()
-            ->willReturn($uriProphecy->reveal())
-            ->shouldBeCalledOnce();
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->expects($this->once())
+            ->method('getUri')
+            ->willReturn($uri);
 
-        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
-        $requestHandlerProphecy
-            ->handle($requestProphecy->reveal())
-            ->shouldBeCalledOnce()
-            ->willReturn($responseProphecy->reveal());
+        $requestHandler = $this->createMock(RequestHandlerInterface::class);
+        $requestHandler->expects($this->once())
+            ->method('handle')
+            ->with($request)
+            ->willReturn($response);
 
-        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
+        $twigMiddleware->process($request, $requestHandler);
     }
 
     public function testProcessWithRequestAttribute()
     {
         $routeParser = $this->createMock(RouteParserInterface::class);
-        $uriProphecy = $this->prophesize(UriInterface::class);
+        $uri = $this->createMock(UriInterface::class);
 
         /** @var Twig $twig */
-        $twig = $this->createTwigProphecy($uriProphecy, '')->reveal();
+        $twig = $this->createTwigMock($uri, '');
 
         $twigMiddleware = new TwigMiddleware($twig, $routeParser, '', 'view');
 
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        // Prophesize the server request that would be returned in the `withAttribute` method.
-        $requestProphecy2 = $this->prophesize(ServerRequestInterface::class);
+        // Create the server request that would be returned in the `withAttribute` method.
+        $request2 = $this->createMock(ServerRequestInterface::class);
 
-        // Prophesize the server request.
-        $requestProphecy = $this->prophesize(ServerRequestInterface::class);
-        $requestProphecy->withAttribute('view', Argument::type(Twig::class))
-            ->shouldBeCalledOnce()
-            ->will(function ($args) use ($requestProphecy2): ServerRequestInterface {
-                $requestProphecy2->getAttribute('view')
-                    ->shouldBeCalledOnce()
-                    ->willReturn($args[1]);
+        // Create the server request.
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->expects($this->once())
+            ->method('withAttribute')
+            ->with('view', $this->isInstanceOf(Twig::class))
+            ->willReturnCallback(function ($name, $value) use ($request2) {
+                $request2->expects($this->once())
+                    ->method('getAttribute')
+                    ->with('view')
+                    ->willReturn($value);
 
-                return $requestProphecy2->reveal();
+                return $request2;
             });
 
-        $requestProphecy
-            ->getUri()
-            ->willReturn($uriProphecy->reveal())
-            ->shouldBeCalledOnce();
+        $request->expects($this->once())
+            ->method('getUri')
+            ->willReturn($uri);
 
-        // Prophesize the request handler.
-        $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
+        // Create the request handler.
+        $requestHandler = $this->createMock(RequestHandlerInterface::class);
         $that = $this;
-        $requestHandlerProphecy
-            ->handle($requestProphecy2->reveal())
-            ->shouldBeCalledOnce()
-            ->will(function ($args) use ($that, $twig, $responseProphecy): ResponseInterface {
+        $requestHandler->expects($this->once())
+            ->method('handle')
+            ->with($request2)
+            ->willReturnCallback(function ($serverRequest) use ($that, $twig, $response): ResponseInterface {
                 /** @var ServerRequestInterface $serverRequest */
-                $serverRequest = $args[0];
                 $that->assertSame($twig, $serverRequest->getAttribute('view'));
 
-                return $responseProphecy->reveal();
+                return $response;
             });
 
-        $twigMiddleware->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
+        $twigMiddleware->process($request, $requestHandler);
     }
 }
