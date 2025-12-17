@@ -93,15 +93,10 @@ class TwigRuntimeExtensionTest extends TestCase
         $routeName = 'route';
         $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
 
-        $uriProphecy = $this->prophesize(UriInterface::class);
-
-        $uriProphecy
-            ->getPath()
-            ->willReturn($path)
-            ->shouldBeCalledOnce();
-
-        /** @var UriInterface $uri */
-        $uri = $uriProphecy->reveal();
+        $uri = $this->createMock(UriInterface::class);
+        $uri->expects($this->once())
+            ->method('getPath')
+            ->willReturn($path);
 
         $extension = new TwigRuntimeExtension($routeParser, $uri, $basePath);
         $result = $extension->isCurrentUrl($routeName, $data);
@@ -135,28 +130,23 @@ class TwigRuntimeExtensionTest extends TestCase
         $routeName = 'route';
         $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
 
-        $uriProphecy = $this->prophesize(UriInterface::class);
+        $uri = $this->createMock(UriInterface::class);
 
         $path = parse_url($url, PHP_URL_PATH);
         $query = parse_url($url, PHP_URL_QUERY) ?? '';
 
-        $uriProphecy
-            ->getPath()
-            ->willReturn($path)
-            ->shouldBeCalledOnce();
+        $uri->expects($this->once())
+            ->method('getPath')
+            ->willReturn($path);
 
-        $uriProphecy
-            ->getQuery()
-            ->willReturn($query)
-            ->shouldBeCalledOnce();
+        $uri->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
 
         $expected = $basePath . $path;
         if ($withQueryString) {
             $expected .= '?' . $query;
         }
-
-        /** @var UriInterface $uri */
-        $uri = $uriProphecy->reveal();
 
         $extension = new TwigRuntimeExtension($routeParser, $uri, $basePath);
         $result = $extension->getCurrentUrl($withQueryString);
@@ -195,10 +185,7 @@ class TwigRuntimeExtensionTest extends TestCase
         $routeCollector = $this->createRouteCollector($basePath);
         $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
 
-        $uriProphecy = $this->prophesize(UriInterface::class);
-
-        /** @var UriInterface $uri */
-        $uri = $uriProphecy->reveal();
+        $uri = $this->createMock(UriInterface::class);
 
         $extension = new TwigRuntimeExtension($routeCollector->getRouteParser(), $uri, $routeCollector->getBasePath());
         $this->assertEquals($expectedUrl, $extension->urlFor($routeName, $routeData, $queryParams));
@@ -241,18 +228,15 @@ class TwigRuntimeExtensionTest extends TestCase
         $routeCollector = $this->createRouteCollector($basePath);
         $this->mapRouteCollectorRoute($routeCollector, ['GET'], $pattern, $routeName);
 
-        $uriProphecy = $this->prophesize(UriInterface::class);
+        $uri = $this->createMock(UriInterface::class);
 
-        $uriProphecy->getScheme()
-            ->willReturn('http')
-            ->shouldBeCalledOnce();
+        $uri->expects($this->once())
+            ->method('getScheme')
+            ->willReturn('http');
 
-        $uriProphecy->getAuthority()
-            ->willReturn('localhost')
-            ->shouldBeCalledOnce();
-
-        /** @var UriInterface $uri */
-        $uri = $uriProphecy->reveal();
+        $uri->expects($this->once())
+            ->method('getAuthority')
+            ->willReturn('localhost');
 
         $extension = new TwigRuntimeExtension($routeCollector->getRouteParser(), $uri, $routeCollector->getBasePath());
         $this->assertEquals($expectedFullUrl, $extension->fullUrlFor($routeName, $routeData, $queryParams));

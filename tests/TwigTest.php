@@ -27,12 +27,12 @@ class TwigTest extends TestCase
     {
         $twig = $this->createMock(Twig::class);
 
-        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
-        $serverRequestProphecy->getAttribute('view')
+        $serverRequest = $this->createMock(ServerRequestInterface::class);
+        $serverRequest->expects($this->once())
+            ->method('getAttribute')
+            ->with('view')
             ->willReturn($twig);
 
-        /** @var ServerRequestInterface $serverRequest */
-        $serverRequest = $serverRequestProphecy->reveal();
         $this->assertSame($twig, Twig::fromRequest($serverRequest));
     }
 
@@ -40,12 +40,12 @@ class TwigTest extends TestCase
     {
         $twig = $this->createMock(Twig::class);
 
-        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
-        $serverRequestProphecy->getAttribute('foo')
+        $serverRequest = $this->createMock(ServerRequestInterface::class);
+        $serverRequest->expects($this->once())
+            ->method('getAttribute')
+            ->with('foo')
             ->willReturn($twig);
 
-        /** @var ServerRequestInterface $serverRequest */
-        $serverRequest = $serverRequestProphecy->reveal();
         $this->assertSame($twig, Twig::fromRequest($serverRequest, 'foo'));
     }
 
@@ -54,12 +54,12 @@ class TwigTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Twig could not be found in the server request attributes using the key "view".');
 
-        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
-        $serverRequestProphecy->getAttribute('view')
+        $serverRequest = $this->createMock(ServerRequestInterface::class);
+        $serverRequest->expects($this->once())
+            ->method('getAttribute')
+            ->with('view')
             ->willReturn(null);
 
-        /** @var ServerRequestInterface $serverRequest */
-        $serverRequest = $serverRequestProphecy->reveal();
         Twig::fromRequest($serverRequest);
     }
 
@@ -68,12 +68,12 @@ class TwigTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Twig could not be found in the server request attributes using the key "view".');
 
-        $serverRequestProphecy = $this->prophesize(ServerRequestInterface::class);
-        $serverRequestProphecy->getAttribute('view')
+        $serverRequest = $this->createMock(ServerRequestInterface::class);
+        $serverRequest->expects($this->once())
+            ->method('getAttribute')
+            ->with('view')
             ->willReturn('twiggy');
 
-        /** @var ServerRequestInterface $serverRequest */
-        $serverRequest = $serverRequestProphecy->reveal();
         Twig::fromRequest($serverRequest);
     }
 
