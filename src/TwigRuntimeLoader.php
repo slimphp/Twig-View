@@ -45,7 +45,7 @@ class TwigRuntimeLoader implements RuntimeLoaderInterface
      */
     public function load(string $class)
     {
-        if (TwigRuntimeExtension::class === $class) {
+        if ($class === TwigRuntimeExtension::class) {
             return new $class($this->routeParser, $this->uri, $this->basePath);
         }
 
