@@ -4,7 +4,7 @@
          beStrictAboutChangesToGlobalState="true" beStrictAboutOutputDuringTests="true" colors="true"
          bootstrap="tests/bootstrap.php" executionOrder="random" cacheDirectory=".phpunit.cache">
     <testsuites>
-        <testsuite name="Slim Test Suite">
+        <testsuite name="Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
