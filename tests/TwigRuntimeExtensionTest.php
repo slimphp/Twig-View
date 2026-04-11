@@ -70,10 +70,12 @@ class TwigRuntimeExtensionTest extends TestCase
     public static function isCurrentUrlProvider(): array
     {
         return [
-            ['/hello/{name}', ['name' => 'world'], '/hello/world', '/base-path', true],
             ['/hello/{name}', ['name' => 'world'], '/hello/world', '', true],
-            ['/hello/{name}', ['name' => 'world'], '/hello/john', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/base-path/hello/world', '/base-path', true],
             ['/hello/{name}', ['name' => 'world'], '/hello/john', '', false],
+            ['/hello/{name}', ['name' => 'world'], '/hello/world', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/base-path/hello/john', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/other/path', '/base-path', false],
         ];
     }
 
@@ -89,7 +91,7 @@ class TwigRuntimeExtensionTest extends TestCase
     #[DataProvider('isCurrentUrlProvider')]
     public function testIsCurrentUrl(string $pattern, array $data, string $path, ?string $basePath, bool $expected)
     {
-        $routeCollector = $this->createRouteCollector($basePath);
+        $routeCollector = $this->createRouteCollector('');
         $routeParser = $routeCollector->getRouteParser();
 
         $routeName = 'route';
