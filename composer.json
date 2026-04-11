@@ -14,12 +14,12 @@
         {
             "name": "Josh Lockhart",
             "email": "hello@joshlockhart.com",
-            "homepage": "http://joshlockhart.com"
+            "homepage": "https://joshlockhart.com"
         },
         {
             "name": "Pierre Berube",
             "email": "pierre@lgse.com",
-            "homepage": "http://www.lgse.com"
+            "homepage": "https://www.lgse.com"
         }
     ],
     "homepage": "https://www.slimframework.com",
@@ -51,7 +51,7 @@
         "cs:check": "php-cs-fixer fix --dry-run --format=txt --verbose --diff --config=.cs.php --ansi --allow-unsupported-php-version=yes",
         "cs:fix": "php-cs-fixer fix --config=.cs.php --ansi --verbose --allow-unsupported-php-version=yes",
         "stan": "phpstan analyse -c phpstan.neon --no-progress --ansi",
-        "test": "phpunit --configuration phpunit.xml --do-not-cache-result --colors=always --display-warnings --display-deprecations --no-coverage",
+        "test": "phpunit --configuration phpunit.xml --do-not-cache-result --colors=always --no-coverage",
         "test:all": [
             "@cs:check",
             "@stan",
@@ -59,7 +59,7 @@
         ],
         "test:coverage": [
             "@putenv XDEBUG_MODE=coverage",
-            "phpunit --configuration phpunit.xml --do-not-cache-result --colors=always --display-deprecations --coverage-clover build/coverage/clover.xml --coverage-html build/coverage --coverage-text"
+            "phpunit --configuration phpunit.xml --do-not-cache-result --colors=always --coverage-clover build/coverage/clover.xml --coverage-html build/coverage --coverage-text"
         ]
     }
 }
