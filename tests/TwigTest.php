@@ -113,12 +113,12 @@ class TwigTest extends TestCase
     public function testFetch()
     {
         $loader = new ArrayLoader([
-            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
+            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n",
         ]);
         $view = new Twig($loader);
 
         $output = $view->fetch('example.html', [
-            'name' => 'Josh'
+            'name' => 'Josh',
         ]);
 
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
@@ -130,7 +130,7 @@ class TwigTest extends TestCase
         $view = new Twig($loader);
 
         $output = $view->fetchFromString("<p>Hi, my name is {{ name }}.</p>", [
-            'name' => 'Josh'
+            'name' => 'Josh',
         ]);
 
         $this->assertEquals("<p>Hi, my name is Josh.</p>", $output);
@@ -142,16 +142,16 @@ class TwigTest extends TestCase
             'block_example.html' => <<<EOF
 {% block first %}<p>Hi, my name is {{name}}.</p>{% endblock %}
 {% block second %}<p>My name is not {{name}}.</p>{% endblock %}
-EOF
+EOF,
         ]);
         $view = new Twig($loader);
 
         $outputOne = $view->fetchBlock('block_example.html', 'first', [
-            'name' => 'Josh'
+            'name' => 'Josh',
         ]);
 
         $outputTwo = $view->fetchBlock('block_example.html', 'second', [
-            'name' => 'Peter'
+            'name' => 'Peter',
         ]);
 
         $this->assertEquals("<p>Hi, my name is Josh.</p>", $outputOne);
@@ -173,7 +173,7 @@ EOF
         );
 
         $anotherDirectory = $view->fetch('@namespace/example.html', [
-            'name' => 'Peter'
+            'name' => 'Peter',
         ]);
 
         $templatesDirectory = $view->fetch('@namespace/another_example.html', [
@@ -199,7 +199,7 @@ EOF
         ]);
 
         $output = $views->fetch('@One/example.html', [
-            'name' => 'Josh'
+            'name' => 'Josh',
         ]);
 
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
@@ -212,7 +212,7 @@ EOF
         ]);
 
         $output = $views->fetch('@One/example.html', [
-            'name' => 'Josh'
+            'name' => 'Josh',
         ]);
 
         $this->assertEquals("<p>Hi, my name is Josh.</p>\n", $output);
@@ -231,12 +231,12 @@ EOF
         ]);
 
         $outputOne = $views->fetch('@One/example.html', [
-            'name' => 'Peter'
+            'name' => 'Peter',
         ]);
 
         $outputTwo = $views->fetch('@Two/another_example.html', [
             'name'   => 'Peter',
-            'gender' => 'male'
+            'gender' => 'male',
         ]);
 
         $outputThree = $views->fetch('@Three/directory/template/example.html', [
@@ -268,7 +268,7 @@ EOF
     public function testRender()
     {
         $loader = new ArrayLoader([
-            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n"
+            'example.html' => "<p>Hi, my name is {{ name }}.</p>\n",
         ]);
         $view = new Twig($loader);
 
@@ -290,7 +290,7 @@ EOF
             ->willReturn($mockBody);
 
         $response = $view->render($mockResponse, 'example.html', [
-            'name' => 'Josh'
+            'name' => 'Josh',
         ]);
         $this->assertInstanceOf(ResponseInterface::class, $response);
     }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Slim\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Slim\Interfaces\CallableResolverInterface;
@@ -69,10 +70,12 @@ class TwigRuntimeExtensionTest extends TestCase
     public static function isCurrentUrlProvider(): array
     {
         return [
-            ['/hello/{name}', ['name' => 'world'], '/hello/world', '/base-path', true],
             ['/hello/{name}', ['name' => 'world'], '/hello/world', '', true],
-            ['/hello/{name}', ['name' => 'world'], '/hello/john', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/base-path/hello/world', '/base-path', true],
             ['/hello/{name}', ['name' => 'world'], '/hello/john', '', false],
+            ['/hello/{name}', ['name' => 'world'], '/hello/world', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/base-path/hello/john', '/base-path', false],
+            ['/hello/{name}', ['name' => 'world'], '/other/path', '/base-path', false],
         ];
     }
 
@@ -85,9 +88,10 @@ class TwigRuntimeExtensionTest extends TestCase
      * @param string|null $basePath
      * @param bool $expected
      */
+    #[DataProvider('isCurrentUrlProvider')]
     public function testIsCurrentUrl(string $pattern, array $data, string $path, ?string $basePath, bool $expected)
     {
-        $routeCollector = $this->createRouteCollector($basePath);
+        $routeCollector = $this->createRouteCollector('');
         $routeParser = $routeCollector->getRouteParser();
 
         $routeName = 'route';
@@ -122,6 +126,7 @@ class TwigRuntimeExtensionTest extends TestCase
      * @param string $basePath
      * @param bool $withQueryString
      */
+    #[DataProvider('currentUrlProvider')]
     public function testCurrentUrl(string $pattern, string $url, string $basePath, bool $withQueryString)
     {
         $routeCollector = $this->createRouteCollector($basePath);
@@ -143,7 +148,7 @@ class TwigRuntimeExtensionTest extends TestCase
             ->method('getQuery')
             ->willReturn($query);
 
-        $expected = $basePath . $path;
+        $expected = $path;
         if ($withQueryString) {
             $expected .= '?' . $query;
         }
@@ -173,6 +178,7 @@ class TwigRuntimeExtensionTest extends TestCase
      * @param string $basePath
      * @param string $expectedUrl
      */
+    #[DataProvider('urlForProvider')]
     public function testUrlFor(
         string $pattern,
         array $routeData,
@@ -216,6 +222,7 @@ class TwigRuntimeExtensionTest extends TestCase
      * @param string $basePath
      * @param string $expectedFullUrl
      */
+    #[DataProvider('fullUrlForProvider')]
     public function testFullUrlFor(
         string $pattern,
         array $routeData,

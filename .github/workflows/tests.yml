@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
@@ -28,8 +28,7 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Coding standards
-        if: matrix.analysis
-        run: composer sniffer:check
+        run: composer cs:check
 
       - name: Static analysis
         if: matrix.analysis
