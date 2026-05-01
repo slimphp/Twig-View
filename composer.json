@@ -31,7 +31,7 @@
         "twig/twig": "^3.11"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.60",
+        "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^1 || ^2",
         "phpunit/phpunit": "^9.6 || ^10 || ^11 || ^12 || ^13",
         "psr/http-factory": "^1.0",
