@@ -34,7 +34,7 @@ class TwigMiddleware implements MiddlewareInterface
      *
      * @return TwigMiddleware
      */
-    public static function createFromContainer(App $app, string $containerKey = 'view'): self
+    public static function createFromContainer(App $app, string $containerKey = 'view', string $attributeName = 'view'): self
     {
         $container = $app->getContainer();
         if ($container === null) {
@@ -56,7 +56,8 @@ class TwigMiddleware implements MiddlewareInterface
         return new self(
             $twig,
             $app->getRouteCollector()->getRouteParser(),
-            $app->getBasePath()
+            $app->getBasePath(),
+            $attributeName
         );
     }
 
